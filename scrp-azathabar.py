@@ -156,7 +156,7 @@ def main():
 		this += 1
 		try:
 			source = Source(url, title=title, scraper=ScraperAzathabar, conn=conn)
-			source.makeRoot("./", ids=ids, root=root, lang="kk")
+			source.makeRoot("./", ids=ids, root=root, lang="tuk")
 			msg = "(%s/%s)" % (this, len(allurls))
 			source.add_to_archive(msg=msg)
 			if ids is None:   # if not ids:
@@ -171,4 +171,17 @@ def main():
 	
 	conn.close()
 
+def tryOneArticle(url):
+	global domain
+	root = None
+	ids = None
+	conn = http.client.HTTPConnection(domain)
+	source = Source(url, title="", scraper=ScraperAzathabar, conn=conn)
+	source.makeRoot("./", ids=ids, root=root, lang="tuk")
+	source.add_to_archive()
+	conn.close()
+
 main()
+#tryOneArticle("http://www.azathabar.com/archive/news/20111231/2239/2239.html?id=24439101")
+#tryOneArticle("http://www.azathabar.com/content/article/24437444.html")
+#tryOneArticle("http://www.azathabar.com/content/article/24425908.html")

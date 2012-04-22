@@ -5,6 +5,7 @@ from urllib import request
 from hashlib import sha1
 #import time.sleep
 from time import sleep
+import time
 
 class Scraper(object):
 	
@@ -13,6 +14,7 @@ class Scraper(object):
 		self.conn = conn
 		#self.content = content
 		self.aid = self.url_to_aid(url)
+		self.date = ""
 
 	def get_content(self):
 		if self.conn != None:
@@ -269,7 +271,7 @@ class ScraperAlaman(Scraper):
 class ScraperAzathabar(Scraper):
 	domain = "www.azathabar.com"
 	prefix = "rferl"
-	rePagecode = re.compile("\/([0-9]*)\.html?$")
+	rePagecode = re.compile("\/([0-9]*)\.html?")
 	rePagecode2 = re.compile("\?id=([0-9]*)")
 
 	def scraped(self):
@@ -278,7 +280,11 @@ class ScraperAzathabar(Scraper):
 			#print(self.doc)
 			el = ""
 
-
+			dateEl = self.doc.find_class('article_date')
+			if len(dateEl)==0:
+				dateEl = self.doc.find_class('date')
+			dateBlah = dateEl[0].text_content().strip('\r\n	 ')
+			self.date = time.strftime('%Y-%m-%d', time.strptime(dateBlah, "%d.%m.%Y"))
 
 			if len(self.doc.find_class('article_txt_intro')) > 0:
 				introels = self.doc.find_class('article_txt_intro')
@@ -288,6 +294,8 @@ class ScraperAzathabar(Scraper):
 				for el in self.doc.find_class('articleContent'):
 					pass
 				#print(str(el))
+				if len(el.find_class('zoomMe')) > 0:
+					el = el.find_class('zoomMe')[0]
 				if lxml.html.clean.clean_html(lxml.html.tostring(el).decode('utf-8')) != "":
 				#if el. is None:
 					#if self.doc.get_element_by_id('introText'):
@@ -301,20 +309,20 @@ class ScraperAzathabar(Scraper):
 
 
 
-			for el in self.doc.find_class('zoomMe'):
-				pass
-			if el == "":
-				for ela in self.doc.find_class('boxwidget_part'):
-					if "id" in ela.attrib:
-						if ela.attrib['id'] == "descText":
-							el = ela
+			#for el in self.doc.find_class('zoomMe'):
+			#	pass
+			#if el == "":
+			#	for ela in self.doc.find_class('boxwidget_part'):
+			#		if "id" in ela.attrib:
+			#			if ela.attrib['id'] == "descText":
+			#				el = ela
 			if el != "":
 				cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(el).decode('utf-8')))
 				#for className in self.badClasses:
 				#	for el in cleaned.find_class(className):
 				#		el.getparent().remove(el)
 				#print(cleaned.text_content())
-				return cleaned.text_content()
+				#return cleaned.text_content()
 				for style in cleaned.findall(".//style"):
 					style.drop_tree()
 				for br in cleaned.findall(".//br"):
@@ -334,8 +342,10 @@ class ScraperAzathabar(Scraper):
 						toadd += introel.text_content()+"\n"
 				to_return = toadd + to_return
 
+				to_return = re.sub('\r\n*', '\n', to_return)
 				to_return = re.sub('\n\n\n*', '\n', to_return)
-				to_return = to_return.strip('\n')
+				#print(to_return)
+				to_return = to_return.strip('\n \t')
 				return to_return
 
 			else:
@@ -344,14 +354,11 @@ class ScraperAzathabar(Scraper):
 	def url_to_aid(self, url):
 		if self.rePagecode.search(url):
 			idsofar = self.rePagecode.search(url).groups()[0]
-			if idsofar!="2239" and len(idsofar) > 4:
+			if len(idsofar) > 4:
 				return idsofar
 			else:
-				if self.rePagecode2.search(url):
-					idsofar = self.rePagecode2.search(url).groups()[0]
-					return idsofar
-				else:
-					return sha1(url.encode('utf-8')).hexdigest()
+				idsofar = self.rePagecode2.search(url).groups()[0]
+				return idsofar
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
 

@@ -19,6 +19,8 @@ class Feed(object):
 	feed_sites = {
 		"www.trtkyrgyz.com": ScraperTRT,
 		"www.azattyk.org": ScraperAzattyk,
+		"www.azattyq.org": ScraperAzattyq,
+		"www.azathabar.com": ScraperAzathabar,
 		"kmb3.kloop.kg": ScraperKloop,
 		"www.bbc.co.uk": ScraperBBC,
 		"alamankg.org": ScraperAlaman
@@ -174,11 +176,12 @@ class Source(object):
 			sys.stdout.write("Adding %s ." % self.url)
 			sys.stdout.flush()
 			self.out_content = scraper.scraped()
+			self.date = scraper.date
 			sys.stdout.write(".")
 			if self.out_content:
 				outTime = datetime.now().isoformat()
 				#print(self.root, self.url, self.entry_id, self.title, outTime, self.out_content)
-				etree.SubElement(self.root, "entry", source=self.url, id=self.entry_id, title=self.title, timestamp=outTime).text = self.out_content
+				etree.SubElement(self.root, "entry", source=self.url, id=self.entry_id, title=self.title, timestamp=outTime, date=self.date).text = self.out_content
 				#print(outdir, self.filename, self)
 				etree.ElementTree(self.root).write(self.path, pretty_print=True, encoding='UTF-8', xml_declaration=False)
 				#print("added.")
