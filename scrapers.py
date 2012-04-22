@@ -284,7 +284,11 @@ class ScraperAzathabar(Scraper):
 			if len(dateEl)==0:
 				dateEl = self.doc.find_class('date')
 			dateBlah = dateEl[0].text_content().strip('\r\n	 ')
-			self.date = time.strftime('%Y-%m-%d', time.strptime(dateBlah, "%d.%m.%Y"))
+			if re.match("[0-9]{2}\.[0-9]{2}\.[0-9]{4}", dateBlah):
+				self.date = time.strftime('%Y-%m-%d', time.strptime(dateBlah, "%d.%m.%Y"))
+			else:
+				dateBlah = re.sub('.*([0-9]{2}\.[0-9]{2}\.[0-9]{4} [0-9]{2}:[0-9]{2}).*', '\\1', dateBlah)
+				self.date = time.strftime('%Y-%m-%dT%H:%M', time.strptime(dateBlah, "%d.%m.%Y %H:%M"))
 
 			if len(self.doc.find_class('article_txt_intro')) > 0:
 				introels = self.doc.find_class('article_txt_intro')

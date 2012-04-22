@@ -49,8 +49,8 @@ topics = { 2239: ("news", "day"),
 
 startyear = 2011
 endyear = 2011
-minmonth = 12
-maxmonth = 12
+minmonth = 1
+maxmonth = 11
 
 startnum = 1
 
@@ -185,3 +185,4 @@ main()
 #tryOneArticle("http://www.azathabar.com/archive/news/20111231/2239/2239.html?id=24439101")
 #tryOneArticle("http://www.azathabar.com/content/article/24437444.html")
 #tryOneArticle("http://www.azathabar.com/content/article/24425908.html")
+#tryOneArticle("http://www.azathabar.com//content/article/2306850.html")
