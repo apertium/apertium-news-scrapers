@@ -47,10 +47,10 @@ topics = { 2239: ("news", "day"),
 	3264: ("Voice_of_people", "days"),
 }	
 
-startyear = 2011
-endyear = 2011
+startyear = 2010
+endyear = 2010
 minmonth = 1
-maxmonth = 11
+maxmonth = 12
 
 startnum = 1
 
