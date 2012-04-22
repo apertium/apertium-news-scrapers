@@ -75,6 +75,7 @@ class Source(object):
 		if not scraper:
 			self.scraper = self.get_scraper(url)
 		else: self.scraper = scraper
+		self.domain = self.scraper.domain
 		if not self.scraper:
 			raise Exception("No scraper set!")	
 
@@ -178,10 +179,14 @@ class Source(object):
 			self.out_content = scraper.scraped()
 			self.date = scraper.date
 			sys.stdout.write(".")
+			if self.url.find(self.domain) > -1:
+				self.fullurl = self.url
+			else:
+				self.fullurl = "http://%s%s" % (self.domain, self.url)
 			if self.out_content:
 				outTime = datetime.now().isoformat()
 				#print(self.root, self.url, self.entry_id, self.title, outTime, self.out_content)
-				etree.SubElement(self.root, "entry", source=self.url, id=self.entry_id, title=self.title, timestamp=outTime, date=self.date).text = self.out_content
+				etree.SubElement(self.root, "entry", source=self.fullurl, id=self.entry_id, title=self.title, timestamp=outTime, date=self.date).text = self.out_content
 				#print(outdir, self.filename, self)
 				etree.ElementTree(self.root).write(self.path, pretty_print=True, encoding='UTF-8', xml_declaration=False)
 				#print("added.")
