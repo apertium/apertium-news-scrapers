@@ -4,7 +4,7 @@ import http.client
 import urllib
 import sys
 
-url = "http://www.bolod.mn/modules.php?name=News&nID="
+article_url = "http://www.bolod.mn/modules.php?name=News&nID="
 contents = ""
 
 conn = http.client.HTTPConnection("www.bolod.mn", 80, timeout=60)
@@ -53,14 +53,13 @@ def get_urls(): #get all the formatted article URLs
 
     article_ids = []
     for cat_id in cats:
-        article_ids += get_article_ids(cat_id, 1)
+        for article_id in get_article_ids(cat_id, 1):
+            yield article_url + article_id
         limit = contents.count("&pg=")
         if limit > 1:
             for i in range(2, limit + 1):
-                article_ids += get_article_ids(cat_id, i)
-
-    for article_id in article_ids:
-        yield url + article_id
+                for article_id in get_article_ids(cat_id, i):
+                    yield article_url + article_id
 
 '''
 for url in get_urls():
