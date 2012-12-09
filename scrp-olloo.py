@@ -36,14 +36,20 @@ def get_list_urls(): #get all the urls of the pages with links to articles
     return get_between_all(contents, '<li><a href="modules.php?', 'l=')
 
 def get_article_ids(year, month): #get all the article ids from specific category id (and page #)
-    conn = http.client.HTTPConnection("www.olloo.mn", 80, timeout=60)
-    params = urllib.parse.urlencode({'name': 'Stories_Archive', 'sa': 'show_month', 'year': year, 'month': month})
-    conn.request("GET", "/modules.php?" + params)
-    res = conn.getresponse()
-    if res.status != 200:
-        print(res.status, res.reason)
-    contents = res.read().decode('cp1251')
-    return get_between_all(contents, 'modules.php?name=News&amp;file=print&amp;sid=', '"')
+    while True:
+        try:    
+            conn = http.client.HTTPConnection("www.olloo.mn", 80, timeout=60)
+            params = urllib.parse.urlencode({'name': 'Stories_Archive', 'sa': 'show_month', 'year': year, 'month': month})
+            conn.request("GET", "/modules.php?" + params)
+            res = conn.getresponse()
+            if res.status != 200:
+                print(res.status, res.reason)
+            contents = res.read().decode('cp1251')
+            return get_between_all(contents, 'modules.php?name=News&amp;file=print&amp;sid=', '"')
+        except:
+            continue
+        break
+        
 
 def get_urls(): #get all the formatted article URLs
     params_list = get_list_urls()
