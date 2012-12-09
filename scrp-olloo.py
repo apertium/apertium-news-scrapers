@@ -2,12 +2,18 @@
 
 import http.client
 import html.parser
+import hashlib
+import os.path
 import urllib
 import sys
 
+domain = "www.olloo.mn"
 article_url = "http://www.olloo.mn/modules.php?name=News&file=print&sid="
 contents = ""
 h = html.parser.HTMLParser()
+
+if not os.path.exists('./.cache'):
+    os.makedirs('./.cache')
 
 def get_between(strSource, strStart, strEnd): #get first string between 2 other strings
     try:
@@ -28,25 +34,33 @@ def get_between_all(strSource, strStart, strEnd): #get all the strings between t
         word = get_between(strSource, strStart, strEnd)
     return list
 
+def get_contents(url, encoding):
+    url_md5 = hashlib.md5(url.encode()).hexdigest()
+    if(os.path.isfile('.cache/' + url_md5)):
+        f = open('.cache/' + url_md5, 'rb')
+        contents = f.read().decode('utf-8')
+        f.close()
+        return contents
+    else:
+        conn = http.client.HTTPConnection(domain, 80, timeout=60)
+        conn.request("GET", url)
+        res = conn.getresponse()
+        if res.status != 200:
+            print(res.status, res.reason)
+        contents = res.read().decode(encoding)
+        f = open('./.cache/' + url_md5, 'wb')
+        f.write(contents.encode('utf-8'))
+        f.close()
+        return contents
+
 def get_list_urls(): #get all the urls of the pages with links to articles
-    conn = http.client.HTTPConnection("www.olloo.mn", 80, timeout=60)
-    conn.request("GET", "/modules.php?name=Stories_Archive")
-    res = conn.getresponse()
-    if res.status != 200:
-        print(res.status, res.reason)
-    contents = res.read().decode('cp1251')
+    contents = get_contents("/modules.php?name=Stories_Archive", 'cp1251')
     return get_between_all(contents, '<li><a href="modules.php?', 'l=')
 
 def get_articles(year, month): #get all the article ids from specific category id (and page #)
     while True:
         try:    
-            conn = http.client.HTTPConnection("www.olloo.mn", 80, timeout=60)
-            params = urllib.parse.urlencode({'name': 'Stories_Archive', 'sa': 'show_month', 'year': year, 'month': month})
-            conn.request("GET", "/modules.php?" + params)
-            res = conn.getresponse()
-            if res.status != 200:
-                print(res.status, res.reason)
-            contents = res.read().decode('cp1251')
+            contents = get_contents("/modules.php?name=Stories_Archive&sa=show_month&year=" + year + "&month=" + month, 'cp1251')
             return get_between_all(contents, 'modules.php?name=News&amp;file=article&amp;sid=', '</a></td>')
         except:
             continue
@@ -62,7 +76,7 @@ def get_urls(): #get all the formatted article URLs
             article_info = article_info.split('">')
             yield article_url + article_info[0], h.unescape(article_info[1])
 
-'''
+
 for url, title in get_urls():
     print([url, title])
-'''
+
