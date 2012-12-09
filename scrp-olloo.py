@@ -76,7 +76,7 @@ def get_urls(): #get all the formatted article URLs
             article_info = article_info.split('">')
             yield article_url + article_info[0], h.unescape(article_info[1])
 
-
+'''
 for url, title in get_urls():
     print([url, title])
-
+'''
