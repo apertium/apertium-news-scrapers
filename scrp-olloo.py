@@ -60,7 +60,7 @@ def get_urls(): #get all the formatted article URLs
         for article_id in current_article_ids:
             yield article_url + article_id
 
-
+'''
 for url in get_urls():
     print(url)
-
+'''
