@@ -36,8 +36,8 @@ def get_between_all(strSource, strStart, strEnd): #get all the strings between t
 
 def get_contents(url, encoding):
     url_md5 = hashlib.md5(url.encode()).hexdigest()
-    if(os.path.isfile('.cache/' + url_md5)):
-        f = open('.cache/' + url_md5, 'rb')
+    if(os.path.isfile('./.cache/' + url_md5)):
+        f = open('./.cache/' + url_md5, 'rb')
         contents = f.read().decode('utf-8')
         f.close()
         return contents
