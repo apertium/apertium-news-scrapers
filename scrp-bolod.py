@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 
 import http.client
+import hashlib
+import os.path
 import urllib
 import sys
 
+domain = "www.bolod.mn"
 article_url = "http://www.bolod.mn/modules.php?name=News&nID="
 contents = ""
 
-conn = http.client.HTTPConnection("www.bolod.mn", 80, timeout=60)
+conn = http.client.HTTPConnection(domain, 80, timeout=60)
+
+if not os.path.exists('./.cache'):
+    os.makedirs('./.cache')
 
 def get_between(strSource, strStart, strEnd): #get first string between 2 other strings
     try:
@@ -28,26 +34,31 @@ def get_between_all(strSource, strStart, strEnd): #get all the strings between t
         word = get_between(strSource, strStart, strEnd)
     return list
 
-def get_cats(): #get all the category ids from the website
-    conn.request("GET", "/index.php")
-    res = conn.getresponse()
-    if res.status != 200:
-        print(res.status, res.reason)
-    contents = res.read().decode()
-    return get_between_all(contents, '&raquo;  <a href="modules.php?name=News&catid=', '">')
-
-def get_articles(cat_id, pg): #get all the article ids from specific category id (and page #)
-    try: 
-        params = urllib.parse.urlencode({'name': 'News', 'catid': cat_id, 'pg': pg})
-        conn.request("GET", "/modules.php?" + params)
+def get_contents(url, encoding):
+    url_md5 = hashlib.md5(url.encode()).hexdigest()
+    if(os.path.isfile('.cache/' + url_md5)):
+        f = open('.cache/' + url_md5, 'rb')
+        contents = f.read().decode('utf-8')
+        f.close()
+        return contents
+    else:
+        conn.request("GET", url)
         res = conn.getresponse()
         if res.status != 200:
             print(res.status, res.reason)
-        contents = res.read().decode()
-        info = get_between_all(contents, '<td><b><a href="modules.php?name=News&nID=', '</a></b></td>')
-        return info
-    except:
-        return []
+        contents = res.read().decode(encoding)
+        f = open('./.cache/' + url_md5, 'wb')
+        f.write(contents.encode('utf-8'))
+        f.close()
+        return contents
+
+def get_cats(): #get all the category ids from the website
+    contents = get_contents("/index.php", 'utf-8')
+    return get_between_all(contents, '&raquo;  <a href="modules.php?name=News&catid=', '">')
+
+def get_articles(cat_id, pg): #get all the article ids from specific category id (and page #)
+    contents = get_contents("/modules.php?name=News&catid=" + cat_id + "&pg=" + str(pg), 'utf-8')
+    return get_between_all(contents, '<td><b><a href="modules.php?name=News&nID=', '</a></b></td>')
 
 def get_urls(): #get all the formatted article URLs
     cats = get_cats()
