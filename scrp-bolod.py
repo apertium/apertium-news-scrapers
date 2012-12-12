@@ -10,8 +10,6 @@ domain = "www.bolod.mn"
 article_url = "http://www.bolod.mn/modules.php?name=News&nID="
 contents = ""
 
-conn = http.client.HTTPConnection(domain, 80, timeout=60)
-
 if not os.path.exists('./.cache'):
     os.makedirs('./.cache')
 
@@ -35,22 +33,29 @@ def get_between_all(strSource, strStart, strEnd): #get all the strings between t
     return list
 
 def get_contents(url, encoding):
-    url_md5 = hashlib.md5(url.encode()).hexdigest()
-    if(os.path.isfile('./.cache/' + url_md5)):
-        f = open('./.cache/' + url_md5, 'rb')
-        contents = f.read().decode('utf-8')
-        f.close()
-        return contents
-    else:
-        conn.request("GET", url)
-        res = conn.getresponse()
-        if res.status != 200:
-            print(res.status, res.reason)
-        contents = res.read().decode(encoding)
-        f = open('./.cache/' + url_md5, 'wb')
-        f.write(contents.encode('utf-8'))
-        f.close()
-        return contents
+	while True:
+		try:
+			url_md5 = hashlib.md5(url.encode()).hexdigest()
+			if(os.path.isfile('./.cache/' + url_md5)):
+				f = open('./.cache/' + url_md5, 'rb')
+				contents = f.read().decode('utf-8')
+				f.close()
+				return contents
+			else:
+				conn = http.client.HTTPConnection(domain, 80, timeout=60)
+				conn.request("GET", url)
+				res = conn.getresponse()
+				if res.status != 200:
+				    print(res.status, res.reason)
+				contents = res.read().decode(encoding)
+				f = open('./.cache/' + url_md5, 'wb')
+				f.write(contents.encode('utf-8'))
+				f.close()
+				conn.close()
+				return contents
+		except:
+			continue
+		break
 
 def get_cats(): #get all the category ids from the website
     contents = get_contents("/index.php", 'utf-8')
@@ -76,6 +81,7 @@ def get_urls(): #get all the formatted article URLs
                     yield article_url + article_info[0], article_info[1]
 
 '''
-for url, title in get_urls():
+for (url, title) in get_urls():
     print([url, title])
 '''
+
