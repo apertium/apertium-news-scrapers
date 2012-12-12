@@ -33,33 +33,38 @@ def get_between_all(strSource, strStart, strEnd): #get all the strings between t
     return list
 
 def get_contents(url, encoding):
-	while True:
-		try:
-			url_md5 = hashlib.md5(url.encode()).hexdigest()
-			if(os.path.isfile('./.cache/' + url_md5)):
-				f = open('./.cache/' + url_md5, 'rb')
-				contents = f.read().decode('utf-8')
-				f.close()
-				return contents
-			else:
-				conn = http.client.HTTPConnection(domain, 80, timeout=60)
-				conn.request("GET", url)
-				res = conn.getresponse()
-				if res.status != 200:
-				    print(res.status, res.reason)
-				contents = res.read().decode(encoding)
-				f = open('./.cache/' + url_md5, 'wb')
-				f.write(contents.encode('utf-8'))
-				f.close()
-				conn.close()
-				return contents
-		except:
-			continue
-		break
+    while True:
+        try:
+            url_md5 = hashlib.md5(url.encode()).hexdigest()
+            if(os.path.isfile('./.cache/' + url_md5)):
+                f = open('./.cache/' + url_md5, 'rb')
+                contents = f.read().decode('utf-8')
+                f.close()
+                return contents
+            else:
+                conn = http.client.HTTPConnection(domain, 80, timeout=60)
+                conn.request("GET", url)
+                res = conn.getresponse()
+                if res.status != 200:
+                    print(res.status, res.reason)
+                contents = res.read().decode(encoding)
+                f = open('./.cache/' + url_md5, 'wb')
+                f.write(contents.encode('utf-8'))
+                f.close()
+                conn.close()
+                return contents
+        except:
+            continue
+        break
 
 def get_cats(): #get all the category ids from the website
     contents = get_contents("/index.php", 'utf-8')
-    return get_between_all(contents, '&raquo;  <a href="modules.php?name=News&catid=', '">')
+    categories = get_between_all(contents, 'modules.php?name=News&catid=', '"')
+    outlist = []
+    for element in categories:
+        if element not in outlist:
+            outlist.append(element)
+    return outlist
 
 def get_articles(cat_id, pg): #get all the article ids from specific category id (and page #)
     contents = get_contents("/modules.php?name=News&catid=" + cat_id + "&pg=" + str(pg), 'utf-8')
@@ -67,21 +72,20 @@ def get_articles(cat_id, pg): #get all the article ids from specific category id
 
 def get_urls(): #get all the formatted article URLs
     cats = get_cats()
-
+    print(cats)
     article_ids = []
     for cat_id in cats:
         for article_info in get_articles(cat_id, 1):
             article_info = article_info.split('">')
-            yield article_url + article_info[0], article_info[1]
+            yield article_url + article_info[0], article_info[1].replace('\t', '').strip()
         limit = contents.count("&pg=")
         if limit > 1:
             for i in range(2, limit + 1):
                 for article_info in get_articles(cat_id, i):
                     article_info = article_info.split('">')
-                    yield article_url + article_info[0], article_info[1]
+                    yield article_url + article_info[0], article_info[1].replace('\t', '').strip()
 
 '''
 for (url, title) in get_urls():
     print([url, title])
 '''
-
