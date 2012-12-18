@@ -367,3 +367,18 @@ class ScraperAzathabar(Scraper):
 			return sha1(url.encode('utf-8')).hexdigest()
 
 
+class ScraperOlloo(Scraper):
+	domain = "www.olloo.mn"
+	prefix = "olloo"
+	rePagecode = re.compile("\/([0-9]*)\.html?")
+
+	def scraped(self):
+		cleaned_content = self.content.split('<font class="content">')
+		cleaned_content = re.sub(r'<[^>]*?>', '', cleaned_content[2])
+		return cleaned_content
+
+	def url_to_aid(self, url):
+		if self.rePagecode.search(url):
+			return self.rePagecode.search(url).groups()[0]
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
