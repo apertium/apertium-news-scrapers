@@ -6,6 +6,9 @@ from hashlib import sha1
 #import time.sleep
 from time import sleep
 import time
+import html.parser
+
+h = html.parser.HTMLParser()
 
 class Scraper(object):
 	
@@ -16,7 +19,7 @@ class Scraper(object):
 		self.aid = self.url_to_aid(url)
 		self.date = ""
 
-	def get_content(self):
+	def get_content(self, encoding='utf-8'):
 		if self.conn != None:
 			self.conn.request("GET", self.url)
 			sleep(0.5)
@@ -27,9 +30,9 @@ class Scraper(object):
 				print(res.status, res.reason)
 				self.reconnect()
 				return False
-			self.content = res.read().decode('utf-8')
+			self.content = res.read().decode(encoding)
 		else:
-			self.content = request.urlopen(self.url).read().decode('utf-8')
+			self.content = request.urlopen(self.url).read().decode(encoding)
 		towrite = lxml.html.fromstring(self.content)
 		if towrite is not None:
 			self.doc = towrite
@@ -373,9 +376,14 @@ class ScraperOlloo(Scraper):
 	rePagecode = re.compile("\/([0-9]*)\.html?")
 
 	def scraped(self):
-		self.get_content()
+		self.get_content('cp1251')
 		cleaned_content = self.content.split('<font class="content">')
 		cleaned_content = re.sub(r'<[^>]*?>', '', cleaned_content[2])
+		cleaned_content = h.unescape(cleaned_content)
+		cleaned_content = cleaned_content.replace('V', 'Ү')
+		cleaned_content = cleaned_content.replace('v', 'ү')
+		cleaned_content = cleaned_content.replace('Є', 'Ө')
+		cleaned_content = cleaned_content.replace('є', 'ө')
 		return cleaned_content
 
 	def url_to_aid(self, url):
