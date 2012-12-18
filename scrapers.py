@@ -373,6 +373,7 @@ class ScraperOlloo(Scraper):
 	rePagecode = re.compile("\/([0-9]*)\.html?")
 
 	def scraped(self):
+		self.get_content()
 		cleaned_content = self.content.split('<font class="content">')
 		cleaned_content = re.sub(r'<[^>]*?>', '', cleaned_content[2])
 		return cleaned_content

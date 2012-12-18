@@ -85,7 +85,5 @@ def get_urls(): #get all the formatted article URLs
                     article_info = article_info.split('">')
                     yield article_url + article_info[0], article_info[1].replace('\t', '').strip()
 
-'''
 for (url, title) in get_urls():
     print([url, title])
-'''

@@ -91,14 +91,14 @@ def main():
     for (url, title) in get_urls():
         try:
             source = Source(url, title=title, scraper=ScraperOlloo, conn=conn)
-            source.out_content = source.scraper.scraped()
-            print(source.out_content)
-            #source.makeRoot("./", ids=ids, root=root)
-            #source.add_to_archive()
-            #if ids is None:   # if not ids:
-            #    ids = source.ids
-            #if root is None:  # if not root:
-            #    root = source.root
+            #source.out_content = source.scraper.scraped()
+            #print(source.out_content)
+            source.makeRoot("./", ids=ids, root=root)
+            source.add_to_archive()
+            if ids is None:   # if not ids:
+                ids = source.ids
+            if root is None:  # if not root:
+                root = source.root
         except Exception as e:
             sys.stdout.write(str(e))
     conn.close()
