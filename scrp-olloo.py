@@ -63,6 +63,10 @@ def get_contents(url, encoding):
 
 def get_list_urls(): #get all the urls of the pages with links to articles
     contents = get_contents("/modules.php?name=Stories_Archive", 'cp1251')
+    contents = contents.replace('V', 'Ү')
+    contents = contents.replace('v', 'ү')
+    contents = contents.replace('Є', 'Ө')
+    contents = contents.replace('є', 'ө')
     return get_between_all(contents, '<li><a href="modules.php?', 'l=')
 
 def get_articles(year, month): #get all the article ids from specific category id (and page #)
@@ -95,7 +99,7 @@ def main():
             #print(source.out_content)
             source.makeRoot("./", ids=ids, root=root)
             source.add_to_archive()
-            if ids is None:   # if not ids:
+            if ids is None:   # ighf not ids:
                 ids = source.ids
             if root is None:  # if not root:
                 root = source.root
