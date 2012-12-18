@@ -6,9 +6,11 @@ import hashlib
 import os.path
 import urllib
 import sys
+from scrapers import ScraperOlloo
+from scraper_classes import Source
 
 domain = "www.olloo.mn"
-article_url = "http://www.olloo.mn/modules.php?name=News&file=print&sid="
+article_url = "/modules.php?name=News&file=print&sid="
 contents = ""
 h = html.parser.HTMLParser()
 
@@ -35,29 +37,29 @@ def get_between_all(strSource, strStart, strEnd): #get all the strings between t
     return list
 
 def get_contents(url, encoding):
-	while True:
-		try:
-			url_md5 = hashlib.md5(url.encode()).hexdigest()
-			if(os.path.isfile('./.cache/' + url_md5)):
-				f = open('./.cache/' + url_md5, 'rb')
-				contents = f.read().decode('utf-8')
-				f.close()
-				return contents
-			else:
-				conn = http.client.HTTPConnection(domain, 80, timeout=60)
-				conn.request("GET", url)
-				res = conn.getresponse()
-				if res.status != 200:
-				    print(res.status, res.reason)
-				contents = res.read().decode(encoding)
-				f = open('./.cache/' + url_md5, 'wb')
-				f.write(contents.encode('utf-8'))
-				f.close()
-				conn.close()
-				return contents
-		except:
-			continue
-		break
+    while True:
+        try:
+            url_md5 = hashlib.md5(url.encode()).hexdigest()
+            if(os.path.isfile('./.cache/' + url_md5)):
+                f = open('./.cache/' + url_md5, 'rb')
+                contents = f.read().decode('utf-8')
+                f.close()
+                return contents
+            else:
+                conn = http.client.HTTPConnection(domain, 80, timeout=60)
+                conn.request("GET", url)
+                res = conn.getresponse()
+                if res.status != 200:
+                    print(res.status, res.reason)
+                contents = res.read().decode(encoding)
+                f = open('./.cache/' + url_md5, 'wb')
+                f.write(contents.encode('utf-8'))
+                f.close()
+                conn.close()
+                return contents
+        except:
+            continue
+        break
 
 def get_list_urls(): #get all the urls of the pages with links to articles
     contents = get_contents("/modules.php?name=Stories_Archive", 'cp1251')
@@ -82,7 +84,23 @@ def get_urls(): #get all the formatted article URLs
             article_info = article_info.split('">')
             yield article_url + article_info[0], h.unescape(article_info[1])
 
-'''
-for (url, title) in get_urls():
-    print([url, title])
-'''
+def main():
+    conn = http.client.HTTPConnection("www.olloo.mn")
+    ids = None
+    root = None
+    for (url, title) in get_urls():
+        try:
+            source = Source(url, title=title, scraper=ScraperOlloo, conn=conn)
+            source.out_content = source.scraper.scraped()
+            print(source.out_content)
+            #source.makeRoot("./", ids=ids, root=root)
+            #source.add_to_archive()
+            #if ids is None:   # if not ids:
+            #    ids = source.ids
+            #if root is None:  # if not root:
+            #    root = source.root
+        except Exception as e:
+            sys.stdout.write(str(e))
+    conn.close()
+
+main()
