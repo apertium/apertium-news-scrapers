@@ -20,6 +20,7 @@ class Scraper(object):
 		self.date = ""
 
 	def get_content(self, encoding='utf-8'):
+		self.reconnect()
 		if self.conn != None:
 			self.conn.request("GET", self.url)
 			sleep(0.5)
@@ -377,13 +378,32 @@ class ScraperOlloo(Scraper):
 
 	def scraped(self):
 		self.get_content('cp1251')
-		cleaned_content = self.content.split('<font class="content">')
-		cleaned_content = re.sub(r'<[^>]*?>', '', cleaned_content[2])
+		cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class('content')[1]).decode('utf-8')))
+		cleaned = cleaned.text_content()
+		cleaned = h.unescape(cleaned)
+		cleaned = cleaned.replace('V', 'Ү')
+		cleaned = cleaned.replace('v', 'ү')
+		cleaned = cleaned.replace('Є', 'Ө')
+		cleaned = cleaned.replace('є', 'ө')
+		return cleaned
+
+	def url_to_aid(self, url):
+		if self.rePagecode.search(url):
+			return self.rePagecode.search(url).groups()[0]
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
+
+class ScraperBolod(Scraper):
+	domain = "www.bolod.mn"
+	prefix = "bolod"
+	rePagecode = re.compile("\/([0-9]*)\.html?")
+
+	def scraped(self):
+		self.get_content()
+		cleaned_content = self.content.split('<div align="justify">')
+		cleaned_content = cleaned_content[1].split('</p></div></td>')
+		cleaned_content = re.sub(r'<[^>]*?>', '', cleaned_content[0])
 		cleaned_content = h.unescape(cleaned_content)
-		cleaned_content = cleaned_content.replace('V', 'Ү')
-		cleaned_content = cleaned_content.replace('v', 'ү')
-		cleaned_content = cleaned_content.replace('Є', 'Ө')
-		cleaned_content = cleaned_content.replace('є', 'ө')
 		return cleaned_content
 
 	def url_to_aid(self, url):
