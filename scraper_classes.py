@@ -77,10 +77,10 @@ class Source(object):
 		else: self.scraper = scraper
 		self.domain = self.scraper.domain
 		if not self.scraper:
-			raise Exception("No scraper set!")	
+			raise Exception("No scraper set!")
 
 		#self.makeRoot()
-
+		
 	def get_scraper(self, url):
 		return
 	
@@ -177,6 +177,12 @@ class Source(object):
 			sys.stdout.write("Adding %s ." % self.url)
 			sys.stdout.flush()
 			self.out_content = scraper.scraped()
+			print("")
+			print("------------------------------------------------------------------------")
+			print(self.out_content)
+			print("------------------------------------------------------------------------")
+			print("")
+			#self.out_content = None
 			self.date = scraper.date
 			sys.stdout.write(".")
 			if self.url.find(self.domain) > -1:
