@@ -374,7 +374,6 @@ class ScraperAzathabar(Scraper):
 class ScraperOlloo(Scraper):
 	domain = "www.olloo.mn"
 	prefix = "olloo"
-	rePagecode = re.compile("\/([0-9]*)\.html?")
 
 	def scraped(self):
 		self.get_content('cp1251')
@@ -388,26 +387,26 @@ class ScraperOlloo(Scraper):
 		return cleaned
 
 	def url_to_aid(self, url):
-		if self.rePagecode.search(url):
-			return self.rePagecode.search(url).groups()[0]
+		uid = url.split("&sid=")[1]
+		if uid is not None:
+			return uid
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
 
 class ScraperBolod(Scraper):
 	domain = "www.bolod.mn"
 	prefix = "bolod"
-	rePagecode = re.compile("\/([0-9]*)\.html?")
 
 	def scraped(self):
 		self.get_content()
-		cleaned_content = self.content.split('<div align="justify">')
-		cleaned_content = cleaned_content[1].split('</p></div></td>')
-		cleaned_content = re.sub(r'<[^>]*?>', '', cleaned_content[0])
-		cleaned_content = h.unescape(cleaned_content)
-		return cleaned_content
+		cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.xpath("//div[@align='justify']")[0]).decode('utf-8')))
+		cleaned = cleaned.text_content()
+		cleaned = h.unescape(cleaned)
+		return cleaned.strip()
 
 	def url_to_aid(self, url):
-		if self.rePagecode.search(url):
-			return self.rePagecode.search(url).groups()[0]
+		uid = url.split("&nID=")[1]
+		if uid is not None:
+			return uid
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
