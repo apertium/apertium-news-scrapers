@@ -5,9 +5,11 @@ import hashlib
 import os.path
 import urllib
 import sys
+from scrapers import ScraperBolod
+from scraper_classes import Source
 
 domain = "www.bolod.mn"
-article_url = "http://www.bolod.mn/modules.php?name=News&nID="
+article_url = "/modules.php?name=News&nID="
 contents = ""
 
 if not os.path.exists('./.cache'):
@@ -72,7 +74,6 @@ def get_articles(cat_id, pg): #get all the article ids from specific category id
 
 def get_urls(): #get all the formatted article URLs
     cats = get_cats()
-    print(cats)
     article_ids = []
     for cat_id in cats:
         for article_info in get_articles(cat_id, 1):
@@ -85,5 +86,23 @@ def get_urls(): #get all the formatted article URLs
                     article_info = article_info.split('">')
                     yield article_url + article_info[0], article_info[1].replace('\t', '').strip()
 
-for (url, title) in get_urls():
-    print([url, title])
+def main():
+    conn = http.client.HTTPConnection("www.bolod.mn")
+    ids = None
+    root = None
+    for (url, title) in get_urls():
+        try:
+            source = Source(url, title=title, scraper=ScraperBolod, conn=conn)
+            #source.out_content = source.scraper.scraped()
+            #print(source.out_content)
+            source.makeRoot("./", ids=ids, root=root)
+            source.add_to_archive()
+            if ids is None:   # ighf not ids:
+                ids = source.ids
+            if root is None:  # if not root:
+                root = source.root
+        except Exception as e:
+            sys.stdout.write(str(e))
+    conn.close()
+
+main()
