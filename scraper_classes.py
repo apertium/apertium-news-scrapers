@@ -177,11 +177,11 @@ class Source(object):
 			sys.stdout.write("Adding %s ." % self.url)
 			sys.stdout.flush()
 			self.out_content = scraper.scraped()
-			print("")
-			print("------------------------------------------------------------------------")
-			print(self.out_content)
-			print("------------------------------------------------------------------------")
-			print("")
+			#print("")
+			#print("------------------------------------------------------------------------")
+			#print(self.out_content)
+			#print("------------------------------------------------------------------------")
+			#print("")
 			#self.out_content = None
 			self.date = scraper.date
 			sys.stdout.write(".")
