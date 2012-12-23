@@ -31,7 +31,7 @@ class Scraper(object):
 				print(res.status, res.reason)
 				self.reconnect()
 				return False
-			self.content = res.read().decode(encoding)
+			self.content = res.read().decode(encoding).encode('utf-8').decode('utf-8')
 		else:
 			self.content = request.urlopen(self.url).read().decode(encoding)
 		towrite = lxml.html.fromstring(self.content)
@@ -401,7 +401,7 @@ class ScraperBolod(Scraper):
 		self.get_content()
 		cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.xpath("//div[@align='justify']")[0]).decode('utf-8')))
 		cleaned = cleaned.text_content()
-		cleaned = h.unescape(cleaned)
+		cleaned = h.unescape(cleaned).replace("\r", "") #extra carriage return instead of \n added for no reason
 		return cleaned.strip()
 
 	def url_to_aid(self, url):
