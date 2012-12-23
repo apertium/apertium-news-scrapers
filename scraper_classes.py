@@ -8,6 +8,8 @@ from hashlib import sha1
 from scrapers import *
 import rssfucker
 from lxml import etree
+import lxml.html
+from lxml.html import clean
 from datetime import datetime
 import sys
 
@@ -161,8 +163,6 @@ class Source(object):
 		sys.stdout.write(".")
 		sys.stdout.flush()
 
-	
-
 	def add_to_archive(self, msg=None):
 		scraper = self.scraper(self.url, conn=self.conn)
 		self.aid = scraper.aid
@@ -177,12 +177,6 @@ class Source(object):
 			sys.stdout.write("Adding %s ." % self.url)
 			sys.stdout.flush()
 			self.out_content = scraper.scraped()
-			#print("")
-			#print("------------------------------------------------------------------------")
-			#print(self.out_content)
-			#print("------------------------------------------------------------------------")
-			#print("")
-			#self.out_content = None
 			self.date = scraper.date
 			sys.stdout.write(".")
 			if self.url.find(self.domain) > -1:
