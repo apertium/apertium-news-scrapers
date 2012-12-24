@@ -393,20 +393,22 @@ class ScraperOlloo(Scraper):
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
 
-class ScraperBolod(Scraper):
-	domain = "www.bolod.mn"
-	prefix = "bolod"
+
+class ScraperAzatutyun(Scraper):
+	domain = "www.azatutyun.am"
+	prefix = "azatutyun"
 
 	def scraped(self):
-		self.get_content()
-		cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.xpath("//div[@align='justify']")[0]).decode('utf-8')))
-		cleaned = cleaned.text_content()
-		cleaned = h.unescape(cleaned).replace("\r", "") #extra carriage return instead of \n added for no reason
-		return cleaned.strip()
+		print("scrapers.py: scraped() is returning: ")
+		print self.get_content()
+
+		return self.get_content()
+
 
 	def url_to_aid(self, url):
-		uid = url.split("&nID=")[1]
-		if uid is not None:
-			return uid
+		print("scrapers.py: url_to_aid("+url+")")
+
+		if self.rePagecode.search(url):
+			return self.rePagecode.search(url).groups()[0]
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
