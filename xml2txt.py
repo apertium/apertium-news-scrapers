@@ -5,13 +5,18 @@ import os
 import sys
 import re
 from lxml import etree
+import argparse
 
-if len(sys.argv) < 3:
-	print("Usage: %s corpus_dir output_file" % sys.argv[0])
-	sys.exit()
+#argparser
+parser = argparse.ArgumentParser(description='xml to txt script')
+parser.add_argument('-i','--corpus_dir', help='corpus directory (input)', required=True)
+parser.add_argument('-o','--output_file', help='name of output_file', required=True)
+parser.add_argument('-s','--sentence', help='split by sentence', required=False)
 
-output = open(sys.argv[2], 'w')
-os.chdir(sys.argv[1])
+args = vars(parser.parse_args())
+
+output = open(args['output_file'], 'w')
+os.chdir(args['corpus_dir'])
 files = os.listdir('.')
 
 xmlFile = re.compile(".*\.xml$")
