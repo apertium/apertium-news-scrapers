@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-
 #import xml.etree.ElementTree as etree
 import os
 import sys
 import re
 from lxml import etree
 import argparse
+import codecs
 
 #argparser
 parser = argparse.ArgumentParser(description='xml to txt script')
 parser.add_argument('-i','--corpus_dir', help='corpus directory (input)', required=True)
 parser.add_argument('-o','--output_file', help='name of output_file', required=True)
-parser.add_argument('-s','--sentence', help='split by sentence', required=False)
+parser.add_argument('-s', '--sentence', action='store_true')
 
 args = vars(parser.parse_args())
 
@@ -21,12 +21,19 @@ files = os.listdir('.')
 
 xmlFile = re.compile(".*\.xml$")
 
+#if -s (split by sentence)
+
+#split by paragraph (default)
 for fn in files:
 	if xmlFile.match(fn):
 		print("Adding content from "+fn)
 		root = etree.parse(fn).getroot()
 		for item in root.getiterator("{http://apertium.org/xml/corpus/0.9}entry"):
-			output.write(item.attrib['title']+'\n'+item.text+'\n\n')
+			if args['sentence'] is not False:
+				sentences = re.split('(?<=[.?!])\s+', item.text)
+				output.write(item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n')
+			else:
+				output.write((item.attrib['title']+'\n'+item.text+'\n\n'))
 
 output.close()
 print("Done.")
