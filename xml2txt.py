@@ -21,18 +21,17 @@ files = os.listdir('.')
 
 xmlFile = re.compile(".*\.xml$")
 
-#if -s (split by sentence)
-
-#split by paragraph (default)
 for fn in files:
 	if xmlFile.match(fn):
 		print("Adding content from "+fn)
 		root = etree.parse(fn).getroot()
 		for item in root.getiterator("{http://apertium.org/xml/corpus/0.9}entry"):
-			if args['sentence'] is not False:
-				sentences = re.split('(?<=[.?!])\s+', item.text)
+			if args['sentence'] is not False: #split by sentence
+				itemtxt=str(item.text)
+				tosplit=itemtxt.replace('   ',' ')
+				sentences = re.split('(?<=[.?!])\s+', tosplit)
 				output.write(item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n')
-			else:
+			else: #split by paragraph (default)
 				output.write((item.attrib['title']+'\n'+item.text+'\n\n'))
 
 output.close()
