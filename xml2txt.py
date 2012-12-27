@@ -10,7 +10,7 @@ import codecs
 def totxt(fn):
 	xmlFile = re.compile(".*\.xml$")
 	if xmlFile.match(fn):
-		print("Adding content from "+fn)
+		
 		root = etree.parse(fn).getroot()
 		for item in root.getiterator("{http://apertium.org/xml/corpus/0.9}entry"):
 			if args['sentence'] is not False: #split by sentence
@@ -26,6 +26,7 @@ def totxt(fn):
 					print("language not supported")
 					sys.exit()
 				if args['output_file'] is not None and sentences is not None:
+					
 					output.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
 				else:
 					sys.stdout.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
@@ -50,14 +51,19 @@ if args['output_file'] is not None:
 
 
 
-
 if (args['corpus_dir'])[-4:] == ".xml": #checks if user entered an xml file
 	totxt(args['corpus_dir'])
+	if args['output_file'] is not None:
+		print("Adding content from "+args['corpus_dir'][(args['corpus_dir'].rfind('/'))+1:])
 else: #if directory
 	os.chdir(args['corpus_dir'])
 	files = os.listdir('.')
 	for fn in files:
+		if args['output_file'] is not None:
+			print("Adding content from "+fn)
 		totxt(fn)
+
+		
 
 if args['output_file'] is not None:
 	output.close()
