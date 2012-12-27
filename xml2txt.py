@@ -16,11 +16,19 @@ def totxt(fn):
 			if args['sentence'] is not False: #split by sentence
 				itemtxt=str(item.text)
 				tosplit=itemtxt.replace('   ',' ')
-				sentences = re.split('(?<=[.?!])\s+', tosplit)
-				if args['output_file'] is not None:
-					output.write(item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n')
+				if "Ա" and "ա" or "է" or "ի" or "ո" or "ը" in tosplit.decode("utf-8"):
+					sentences = re.split('(?<=[:])(\s)?(?=[\u0531-\u0556])?', tosplit)
+					if "а" in tosplit:
+						sentences = re.split('(?<=[.!?])\s(\s)?[\u0410-\u042F]', tosplit)
+				elif "D" or "d" or "F" or "f" or "G" or "g" or "I" or "i" or "J" or "j" or "L" or "l" in tosplit:
+					sentences = re.split('(?<=[.!?])\s(?=[A-Z])', tosplit)
 				else:
-					sys.stdout.write(item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n')
+					print("language not supported")
+					sys.exit()
+				if args['output_file'] is not None and sentences is not None:
+					output.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
+				else:
+					sys.stdout.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
 			else: #split by paragraph (default)
 				if args['output_file'] is not None:
 					output.write((item.attrib['title']+'\n'+item.text+'\n\n'))
@@ -54,5 +62,4 @@ else: #if directory
 if args['output_file'] is not None:
 	output.close()
 print("Done.")
-
 
