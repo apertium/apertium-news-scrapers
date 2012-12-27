@@ -19,7 +19,7 @@ def totxt(fn):
 				if "Ա" and "ա" or "է" or "ի" or "ո" or "ը" in tosplit.decode("utf-8"):
 					#sentences = re.split('(?<=[:])(\s)?(?=[\u0531-\u0556])?', tosplit)
 					if "а" in tosplit:
-						sentences = re.split('(?<![\u0410-\u042F])[.!?]\s(\s)?(?=[\u0410-\u042F])', tosplit)
+						sentences = re.split('(?<![\u0410-\u042F])(?<=[.!?])(\s)?(?=(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', tosplit)
 				elif "D" or "d" or "F" or "f" or "G" or "g" or "I" or "i" or "J" or "j" or "L" or "l" in tosplit:
 					sentences = re.split('(?<=[.!?])\s(?=[A-Z])', tosplit)
 				else:
