@@ -55,6 +55,7 @@ if (args['corpus_dir'])[-4:] == ".xml": #checks if user entered an xml file
 	totxt(args['corpus_dir'])
 	if args['output_file'] is not None:
 		print("Adding content from "+args['corpus_dir'][(args['corpus_dir'].rfind('/'))+1:])
+		print("Done.")
 else: #if directory
 	os.chdir(args['corpus_dir'])
 	files = os.listdir('.')
@@ -62,10 +63,12 @@ else: #if directory
 		if args['output_file'] is not None:
 			print("Adding content from "+fn)
 		totxt(fn)
+	if args['output_file'] is not None:
+		print("Done.")
 
 		
 
 if args['output_file'] is not None:
 	output.close()
-print("Done.")
+
 
