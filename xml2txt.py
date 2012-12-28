@@ -22,24 +22,23 @@ def totxt(fn):
 				#print(item)
 				tosplit=itemtxt.replace('   ',' ')
 				if lang == "eng":
-					sentences = re.split('(?<![A-Z])(?<!([A-Z][a-z]\.)|(Mr|St|Ms|Rd|of|rs)\.)(?<![A-Z].)(?<=[.!?])\s(?=[A-Z])', tosplit)
+					sentences = re.split('(?<!([A-Z][a-z][.]\.)|(\sMr|\sSr|\sJr|D.S|\sin|\sSt|\sMs|\sRd|rof|Mrs|Ave)\.)(?<![A-Z].)(?<=[.!?])\s(?=[A-Z])', tosplit)
 				elif lang == "hye":
-					sentences = re.split('(?<=[:])(\s)?(?=[\u0531-\u0556])?', tosplit)
+					sentences = re.split('(?<=[։:՞])(\s)?(?=[\u0531-\u0556])?', tosplit)
 				elif lang == "rus" or lang == "kir" or lang == "khk":
-					sentences = re.split('(?<![\u0410-\u042F])([.!?])(?=(\s)?(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', tosplit.strip())
-                                        #sentences=[]
-                                        #for a in aaa:
-                                        #     sentences.append(a.strip())
+					#sentences = re.split('(?<![\u0410-\u042F])([.!?])(?=(\s)?(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', tosplit.strip())
+					punctuation = re.compile('(?<![\u0410-\u042F])([.!?])(?=(\s)?(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', re.UNICODE)
 				
-
-
-
 				else:
 					print("language not supported")
 					sys.exit("language not supported")
 				if args['output_file'] is not None:
-					
-					output.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
+					if lang == "rus" or lang == "kir" or lang == "khk":
+						output.write((item.attrib['title']).replace("None", ""))
+						for sentence in reattach(punctuation.split(tosplit)):
+							output.write(str('\n'+sentence+'\n\n').replace("None", ""))
+					else:
+						output.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
 				else:
 					sys.stdout.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
 			else: #split by paragraph (default)
@@ -47,6 +46,19 @@ def totxt(fn):
 					output.write((item.attrib['title']+'\n'+item.text+'\n\n'))
 				else:
 					sys.stdout.write((item.attrib['title']+'\n'+item.text+'\n\n'))
+
+def reattach(sentences):
+    punctuation = ('.','!','?')
+    previous = ''
+    for sentence in sentences:
+        if sentence not in punctuation:
+            previous = sentence
+        else:
+            yield previous + sentence
+            previous = ''
+    if previous:
+        yield previous + "\n"
+
 
 #argparser
 parser = argparse.ArgumentParser(description='xml to txt script')
