@@ -22,7 +22,7 @@ def totxt(fn):
 				#print(item)
 				tosplit=itemtxt.replace('   ',' ')
 				if lang == "eng":
-					sentences = re.split('(?<=(?<![A-Z])(?<![a-z].)?(?=[.!?].))\s(?=[A-Z])', tosplit)
+					sentences = re.split('(?<![A-Z])(?<!([A-Z][a-z]\.)|(Mr|St|Ms|Rd|of|rs)\.)(?<![A-Z].)(?<=[.!?])\s(?=[A-Z])', tosplit)
 				elif lang == "hye":
 					sentences = re.split('(?<=[:])(\s)?(?=[\u0531-\u0556])?', tosplit)
 				elif lang == "rus" or lang == "kir" or lang == "khk":
