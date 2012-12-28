@@ -6,26 +6,35 @@ import re
 from lxml import etree
 import argparse
 import codecs
+import rlcompleter
 
 def totxt(fn):
 	xmlFile = re.compile(".*\.xml$")
 	if xmlFile.match(fn):
-		
+		fileHandle = open (fn,"r" )
+		lineList = fileHandle.readline()
+		fileHandle.close()
+		lang=str(lineList)[lineList.__len__()-6:lineList.__len__()-3] # 3-letter iso code of language of corpus
 		root = etree.parse(fn).getroot()
 		for item in root.getiterator("{http://apertium.org/xml/corpus/0.9}entry"):
 			if args['sentence'] is not False: #split by sentence
 				itemtxt=str(item.text)
+				#print(item)
 				tosplit=itemtxt.replace('   ',' ')
-				if "Ա" and "ա" or "է" or "ի" or "ո" or "ը" in tosplit.decode("utf-8"):
-					#sentences = re.split('(?<=[:])(\s)?(?=[\u0531-\u0556])?', tosplit)
-					if "а" in tosplit:
-						sentences = re.split('(?<![\u0410-\u042F])(?<=[.!?])(\s)?(?=(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', tosplit)
-				elif "D" or "d" or "F" or "f" or "G" or "g" or "I" or "i" or "J" or "j" or "L" or "l" in tosplit:
+				if lang == "eng":
 					sentences = re.split('(?<=[.!?])\s(?=[A-Z])', tosplit)
+				elif lang == "hye" or "kir" or "khk":
+					sentences = re.split('(?<=[:])(\s)?(?=[\u0531-\u0556])?', tosplit)
+					
+				elif lang == ("rus"):
+					sentences = re.split('(?<![\u0410-\u042F])(?<=[.!?])(\s)?(?=(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', tosplit)
+
+
+
 				else:
 					print("language not supported")
-					sys.exit()
-				if args['output_file'] is not None and sentences is not None:
+					sys.exit("language not supported")
+				if args['output_file'] is not None:
 					
 					output.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
 				else:
@@ -54,12 +63,14 @@ if args['output_file'] is not None:
 if (args['corpus_dir'])[-4:] == ".xml": #checks if user entered an xml file
 	totxt(args['corpus_dir'])
 	if args['output_file'] is not None:
-		print("Adding content from "+args['corpus_dir'][(args['corpus_dir'].rfind('/'))+1:])
+		filename=args['corpus_dir'][args['corpus_dir'].rfind('/')+1:]
+		print("Adding content from "+filename)
 		print("Done.")
 else: #if directory
 	os.chdir(args['corpus_dir'])
 	files = os.listdir('.')
 	for fn in files:
+		filename=fn
 		if args['output_file'] is not None:
 			print("Adding content from "+fn)
 		totxt(fn)
