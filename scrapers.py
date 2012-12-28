@@ -380,6 +380,7 @@ class ScraperOlloo(Scraper):
 		cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class('content')[1]).decode('utf-8')))
 		cleaned = cleaned.text_content()
 		cleaned = h.unescape(cleaned)
+		cleaned = h.unescape(cleaned).replace("\r", "") #remove extra carriage returns
 		cleaned = cleaned.replace('V', 'Ү')
 		cleaned = cleaned.replace('v', 'ү')
 		cleaned = cleaned.replace('Є', 'Ө')
