@@ -22,12 +22,15 @@ def totxt(fn):
 				#print(item)
 				tosplit=itemtxt.replace('   ',' ')
 				if lang == "eng":
-					sentences = re.split('(?<=[.!?])\s(?=[A-Z])', tosplit)
-				elif lang == "hye" or "kir" or "khk":
+					sentences = re.split('(?<=(?<![A-Z])(?<![a-z].)?(?=[.!?].))\s(?=[A-Z])', tosplit)
+				elif lang == "hye":
 					sentences = re.split('(?<=[:])(\s)?(?=[\u0531-\u0556])?', tosplit)
-					
-				elif lang == ("rus"):
-					sentences = re.split('(?<![\u0410-\u042F])(?<=[.!?])(\s)?(?=(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', tosplit)
+				elif lang == "rus" or lang == "kir" or lang == "khk":
+					sentences = re.split('(?<![\u0410-\u042F])([.!?])(?=(\s)?(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', tosplit.strip())
+                                        #sentences=[]
+                                        #for a in aaa:
+                                        #     sentences.append(a.strip())
+				
 
 
 
