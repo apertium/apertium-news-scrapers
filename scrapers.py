@@ -400,7 +400,7 @@ class ScraperAzatutyun(Scraper):
 
 	def scraped(self):
 		print("scrapers.py: scraped() is returning: ")
-		print self.get_content()
+		#print self.get_content()
 
 		return self.get_content()
 
