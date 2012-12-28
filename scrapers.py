@@ -412,3 +412,21 @@ class ScraperAzatutyun(Scraper):
 			return self.rePagecode.search(url).groups()[0]
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
+
+class ScraperBolod(Scraper):
+	domain = "www.bolod.mn"
+	prefix = "bolod"
+
+	def scraped(self):
+		self.get_content()
+		cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.xpath("//div[@align='justify']")[0]).decode('utf-8')))
+		cleaned = cleaned.text_content()
+		cleaned = h.unescape(cleaned).replace("\r", "") #remove extra carriage returns
+		return cleaned.strip()
+
+	def url_to_aid(self, url):
+		uid = url.split("&nID=")[1]
+		if uid is not None:
+			return uid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
