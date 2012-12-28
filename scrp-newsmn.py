@@ -6,9 +6,8 @@ startDate = date(2011, 12, 1)
 endDate = date(2011, 12, 31)
 
 
-def main():
-	global startDate, endDate
+def main(startDate, endDate):
 	for (url, title) in getUrls(startDate, endDate):
 		print("%s: %s" % (url, title))
 
-main()
+main(startDate, endDate)
