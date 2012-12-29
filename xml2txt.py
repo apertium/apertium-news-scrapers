@@ -17,6 +17,8 @@ def totxt(fn):
 		fileHandle.close()
 		lang=str(lineList)[lineList.__len__()-6:lineList.__len__()-3] # 3-letter iso code of language of corpus
 		root = etree.parse(fn).getroot()
+		attributes = root.attrib
+		lang=attributes.get("language")
 		for item in root.getiterator("{http://apertium.org/xml/corpus/0.9}entry"):
 			if args['sentence'] is not False: #split by sentence
 				itemtxt=str(item.text)
