@@ -26,31 +26,30 @@ def printArticles(articlesData, fileName, display=False):
         for (title, url) in articlesData:
             print(title, url)
     else:
-        with open(fileName, 'w',encoding='utf-8') as thefile:
+        with open(fileName, 'w', encoding='utf-8') as thefile:
             for (title, url) in articlesData:
                 thefile.write("%s, %s\n" % (title, url))
 
         
 def main(startDate, endDate):
     conn = http.client.HTTPConnection("archive.news.mn")
-    url = urlTemplate % (startDate.isoformat(),endDate.isoformat(),1)
+    url = urlTemplate % (startDate.isoformat(), endDate.isoformat(),1)
     doc = getPage(conn, url)
     numTag = str(lxml.html.tostring(doc.find_class("search-result")[0]))
-    numArticles = int(numTag[numTag.find('/')+2:numTag.find("</")])
+    numArticles = int(numTag[numTag.find('/')+2 : numTag.find("</")])
     
     for i in range(1,int(numArticles/20)+2) :
-        url = urlTemplate % (startDate.isoformat(),endDate.isoformat(),i)
+        url = urlTemplate % (startDate.isoformat(), endDate.isoformat(),i)
         doc = getPage(conn, url)
         divTags = doc.find_class("bd-list-title")
         if len(divTags) is 0:
             break
         for divTag in divTags:
             for article in divTag:
-                title = article.text
+                title = (article.text).strip()
                 url = article.attrib["href"]
                 articles.append((title, url))
-    #assert numArticles is len(articles) #Ensure correct number of articles have been retrieved
     print("%s Articles scraped from %s to %s" % (str(len(articles)), startDate, endDate))
-    printArticles(articles,"test.txt",display=False)
+    printArticles(articles, "test.txt") #, display=True)
         
 main(startDate, endDate)
