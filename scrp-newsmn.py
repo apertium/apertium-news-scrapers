@@ -21,10 +21,12 @@ def getPage(conn, url):
     doc = lxml.html.fromstring(contents)
     return doc
 
-def printArticles(articlesData, fileName):
-    with open(fileName, 'w',encoding='utf-8') as thefile:
-        for (title, url) in articlesData:
-            thefile.write("%s, %s\n" % (title, url))
+def printArticles(articlesData, fileName, display=False):
+    #with open(fileName, 'w',encoding='utf-8') as thefile:
+    #    for (title, url) in articlesData:
+    #        thefile.write("%s, %s\n" % (title, url))
+    for (title, url) in articlesData:
+        print(title, url)
         
 def main(startDate, endDate):
     conn = http.client.HTTPConnection("archive.news.mn")
@@ -46,6 +48,6 @@ def main(startDate, endDate):
                 articles.append((title, url))
     assert numArticles is len(articles) #Ensure correct number of articles have been retrieved
     print("%s Articles scraped from %s to %s" % (str(len(articles)), startDate, endDate))
-    printArticles(articles,"test.txt")
+    printArticles(articles,"test.txt",display=True)
         
 main(startDate, endDate)
