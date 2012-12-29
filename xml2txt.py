@@ -7,6 +7,7 @@ from lxml import etree
 import argparse
 import codecs
 import rlcompleter
+import subprocess
 
 def totxt(fn):
 	xmlFile = re.compile(".*\.xml$")
@@ -19,28 +20,17 @@ def totxt(fn):
 		for item in root.getiterator("{http://apertium.org/xml/corpus/0.9}entry"):
 			if args['sentence'] is not False: #split by sentence
 				itemtxt=str(item.text)
-				#print(item)
 				tosplit=itemtxt.replace('   ',' ')
-				if lang == "eng":
-					sentences = re.split('(?<!([A-Z][a-z][.]\.)|(\sMr|\sSr|\sJr|\sDr|D.S|\sin|\sSt|\sMs|\sRd|rof|Mrs|Ave)\.)(?<![A-Z].)(?<=[.!?])\s(?=[A-Z])', tosplit)
-				elif lang == "hye":
-					sentences = re.split('(?<=[։:՞])(\s)?(?=[\u0531-\u0556])?', tosplit)
-				elif lang == "rus" or lang == "kir" or lang == "khk":
-					#sentences = re.split('(?<![\u0410-\u042F])([.!?])(?=(\s)?(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', tosplit.strip())
-					punctuation = re.compile('(?<![\u0410-\u042F])([.!?])(?=(\s)?(\s)?[\u0410-\u042F]|[\u04E8]|["]|[\u201C]|![0-9])', re.UNICODE)
-				
+				if lang == "eng" or lang == "rus" or lang == "hye":
+                                        py2output = subprocess.check_output(['python', 'getnltk.py', tosplit, lang])
+                                        py2output=(str(py2output,'utf-8'))
 				else:
 					print("language not supported")
 					sys.exit("language not supported")
 				if args['output_file'] is not None:
-					if lang == "rus" or lang == "kir" or lang == "khk":
-						output.write((item.attrib['title']).replace("None", ""))
-						for sentence in reattach(punctuation.split(tosplit)):
-							output.write(str('\n'+sentence+'\n\n').replace("None", ""))
-					else:
-						output.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
+						output.write(item.attrib['title']+'\n'+py2output)
 				else:
-					sys.stdout.write((item.attrib['title']+'\n'+('%s' % '\n'.join(map(str, sentences)))+'\n\n').replace("None", ""))
+					sys.stdout.write((item.attrib['title']+'\n'+py2output))
 			else: #split by paragraph (default)
 				if args['output_file'] is not None:
 					output.write((item.attrib['title']+'\n'+item.text+'\n\n'))
