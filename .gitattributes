@@ -1,4 +1,5 @@
 * text=auto !eol
+/getnltk.py -text
 /rssfucker.py -text
 /scraper_classes.py -text
 /scrapers.py -text
