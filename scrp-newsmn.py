@@ -5,7 +5,7 @@ import lxml.html
 import http.client
 
 startDate = date(2011, 12, 1)
-endDate = date(2011, 12, 2)
+endDate = date(2011, 12, 31)
 
 urlTemplate = "/archive.shtml?q=&from=%s&to=%s&sortBy=NEWEST&page=%s"
 
@@ -22,11 +22,14 @@ def getPage(conn, url):
     return doc
 
 def printArticles(articlesData, fileName, display=False):
-    #with open(fileName, 'w',encoding='utf-8') as thefile:
-    #    for (title, url) in articlesData:
-    #        thefile.write("%s, %s\n" % (title, url))
-    for (title, url) in articlesData:
-        print(title, url)
+    if display:
+        for (title, url) in articlesData:
+            print(title, url)
+    else:
+        with open(fileName, 'w',encoding='utf-8') as thefile:
+            for (title, url) in articlesData:
+                thefile.write("%s, %s\n" % (title, url))
+
         
 def main(startDate, endDate):
     conn = http.client.HTTPConnection("archive.news.mn")
@@ -46,8 +49,8 @@ def main(startDate, endDate):
                 title = article.text
                 url = article.attrib["href"]
                 articles.append((title, url))
-    assert numArticles is len(articles) #Ensure correct number of articles have been retrieved
+    #assert numArticles is len(articles) #Ensure correct number of articles have been retrieved
     print("%s Articles scraped from %s to %s" % (str(len(articles)), startDate, endDate))
-    printArticles(articles,"test.txt",display=True)
+    printArticles(articles,"test.txt",display=False)
         
 main(startDate, endDate)
