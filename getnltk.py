@@ -3,7 +3,13 @@
 import nltk
 from nltk import *
 import argparse
-textt=''
+from urllib import urlopen
+
+
+
+textt='' #for hye
+
+#argparse
 parser = argparse.ArgumentParser(description='xml to txt script')
 parser.add_argument('txt', metavar='t', help='text to input')
 parser.add_argument('lang', metavar='l', help='language')
@@ -12,7 +18,16 @@ text = str(args['txt'])
 if args['lang'] == "eng":
 	sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
 elif args['lang'] == "rus":
-	sent_detector = nltk.data.load('tokenizers/punkt/russian.pickle')
+	raw1=urlopen('http://danielhonline.com/ruscorpus.html').read()#corpus
+	raw = nltk.clean_html(raw1) 
+	trainer = nltk.tokenize.punkt.PunktTrainer(raw) 
+	trainer.INCLUDE_ALL_COLLOCS = True 
+	trainer.INCLUDE_ABBREV_COLLOCS = True
+	params = trainer.get_params()
+	trainer.train(raw) 
+	sbd = PunktSentenceTokenizer(params) 
+	for sentence in sbd.sentences_from_text(text, realign_boundaries=True): 
+		print sentence
 elif args['lang'] == "hye":
 	some_text = text.replace('։', ':')
 	
@@ -25,5 +40,5 @@ elif args['lang'] == "hye":
 	for sentence in sbd.sentences_from_text(some_text):
 		sentence1=sentence.replace(":","։")
 		print sentence1
-if args['lang'] == "eng" or args['lang'] == "rus":
+if args['lang'] == "eng":
 	print '\n'.join(sent_detector.tokenize(text.strip()))
