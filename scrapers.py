@@ -431,3 +431,27 @@ class ScraperBolod(Scraper):
 			return uid
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
+			
+class ScraperNewsmn(Scraper):
+	domain = "www.news.mn"
+	prefix = "news"
+	
+	def scraped(self):
+		self.get_content()
+		if len(self.doc.xpath("//div[@style='text-align: justify;']")) is not 0:
+			content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.xpath("//div[@style='text-align: justify;']")[0]).decode('utf-8'))).text_content().strip()
+		elif len(self.doc.xpath("//p[@style='text-align: justify;']")) is not 0:
+			content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.xpath("//p[@style='text-align: justify;']")[0]).decode('utf-8'))).text_content().strip()
+		elif len(self.doc.find_class("text")) is not 0:
+			content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class("text")[0]).decode('utf-8'))).text_content().strip()
+		elif len(self.doc.find_class("read-bd-body")) is not 0:
+			content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class("read-bd-body")[0]).decode('utf-8'))).text_content().strip()
+		return content
+
+	def url_to_aid(self, url):
+		endUrl = url.split('content/')[1]
+		aid = endUrl[:endUrl.find('.shtml')]
+		if aid is not None:
+			return aid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
