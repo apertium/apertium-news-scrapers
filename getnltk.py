@@ -3,7 +3,7 @@
 import nltk
 from nltk import *
 import argparse
-text=''
+textt=''
 parser = argparse.ArgumentParser(description='xml to txt script')
 parser.add_argument('txt', metavar='t', help='text to input')
 parser.add_argument('lang', metavar='l', help='language')
@@ -18,7 +18,7 @@ elif args['lang'] == "hye":
 	
 	armenian_punkt_vars = nltk.tokenize.punkt.PunktLanguageVars
 	armenian_punkt_vars.sent_end_chars=('!', ':', '։', '?')
-	trainer = nltk.tokenize.punkt.PunktTrainer(text, armenian_punkt_vars)
+	trainer = nltk.tokenize.punkt.PunktTrainer(textt, armenian_punkt_vars)
 	params = trainer.get_params()
 
 	sbd = nltk.tokenize.punkt.PunktSentenceTokenizer(params)
