@@ -23,7 +23,7 @@ def totxt(fn):
 				itemtxt=str(item.text)
 				tosplit=itemtxt.replace('   ',' ')
 				if lang == "eng" or lang == "en" or lang == "rus" or lang == "ru" or lang == "hye" or lang == "hy":
-                                        py2output = subprocess.check_output(['python', 'py2.py', tosplit, lang])
+                                        py2output = subprocess.check_output(['python', 'getnltk.py', tosplit, lang])
                                         py2output=(str(py2output,'utf-8'))
 				else:
 					print("language not supported")
