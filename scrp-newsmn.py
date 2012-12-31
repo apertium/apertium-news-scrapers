@@ -7,7 +7,7 @@ from scraper_classes import Source
 from scrapers import ScraperNewsmn
 
 startDate = date(2011, 11, 1)
-endDate = date(2011, 11, 2)
+endDate = date(2011, 11, 2) #scraper is inclusive of startDate but does not include endDate
 
 urlTemplate = "/archive.shtml?q=&from=%s&to=%s&sortBy=NEWEST&page=%s"
 
@@ -51,7 +51,7 @@ def populateArticlesList(conn):
 				articles.append((title, url))
 	
 def main(startDate, endDate):
-	print("Getting URLs from %s to %s..." % (startDate, endDate))
+	print("Getting URLs from %s to %s..." % (startDate, endDate)) #inclusive of startDate but does not include endDate
 	conn = http.client.HTTPConnection("archive.news.mn")
 	populateArticlesList(conn)
 	print("%s URLs scraped from %s to %s" % (str(len(articles)), startDate, endDate))
