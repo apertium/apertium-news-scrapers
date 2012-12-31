@@ -15,7 +15,6 @@ def totxt(fn):
 		fileHandle = open (fn,"r" )
 		lineList = fileHandle.readline()
 		fileHandle.close()
-		lang=str(lineList)[lineList.__len__()-6:lineList.__len__()-3] # 3-letter iso code of language of corpus
 		root = etree.parse(fn).getroot()
 		attributes = root.attrib
 		lang=attributes.get("language")
@@ -23,8 +22,8 @@ def totxt(fn):
 			if args['sentence'] is not False: #split by sentence
 				itemtxt=str(item.text)
 				tosplit=itemtxt.replace('   ',' ')
-				if lang == "eng" or lang == "rus" or lang == "hye":
-                                        py2output = subprocess.check_output(['python', 'getnltk.py', tosplit, lang])
+				if lang == "eng" or lang == "en" or lang == "rus" or lang == "ru" or lang == "hye" or lang == "hy":
+                                        py2output = subprocess.check_output(['python', 'py2.py', tosplit, lang])
                                         py2output=(str(py2output,'utf-8'))
 				else:
 					print("language not supported")
