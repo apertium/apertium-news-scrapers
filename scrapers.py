@@ -434,7 +434,7 @@ class ScraperBolod(Scraper):
 			
 class ScraperNewsmn(Scraper):
 	domain = "www.news.mn"
-	prefix = "news"
+	prefix = "newsmn"
 	
 	def scraped(self):
 		self.get_content()

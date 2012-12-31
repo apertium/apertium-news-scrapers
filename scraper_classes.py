@@ -13,6 +13,7 @@ from lxml.html import clean
 from datetime import datetime
 import sys
 
+urlMatcher = re.compile('^(http(s?)\:\/\/|~/|/)?([a-zA-Z]{1}([\w\-]+\.)+([\w]{2,5}))(:[\d]{1,5})?/?(\w+\.[\w]{3,4})?((\?\w+=\w+)?(&\w+=\w+)*)?')
 
 class Feed(object):
 
@@ -25,7 +26,8 @@ class Feed(object):
 		"www.azathabar.com": ScraperAzathabar,
 		"kmb3.kloop.kg": ScraperKloop,
 		"www.bbc.co.uk": ScraperBBC,
-		"alamankg.org": ScraperAlaman
+		"alamankg.org": ScraperAlaman,
+		"www.news.mn": ScraperNewsmn
 	}
 
 	which_scraper = None;
@@ -179,7 +181,7 @@ class Source(object):
 			self.out_content = scraper.scraped()
 			self.date = scraper.date
 			sys.stdout.write(".")
-			if self.url.find(self.domain) > -1:
+			if urlMatcher.match(self.url):
 				self.fullurl = self.url
 			else:
 				self.fullurl = "http://%s%s" % (self.domain, self.url)
