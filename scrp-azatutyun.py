@@ -76,6 +76,7 @@ def main(startDate, endDate):
 		except Exception as e:
 			print(url + " " + str(e))			
 	print("%s articles scraped" % scrapedNum)
+	conn.close()
 
 fileName = 'test2.txt'
 with open(fileName, 'w'):
