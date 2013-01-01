@@ -27,8 +27,9 @@ class Feed(object):
 		"kmb3.kloop.kg": ScraperKloop,
 		"www.bbc.co.uk": ScraperBBC,
 		"alamankg.org": ScraperAlaman,
-		"www.news.mn": ScraperNewsmn
-	}
+		"www.news.mn": ScraperNewsmn,
+		"www.azatutyun.am": ScraperAzatutyun
+	}		
 
 	which_scraper = None;
 	feed = None;

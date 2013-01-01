@@ -29,6 +29,7 @@ class Scraper(object):
 				#print("\r", self.url, res.status, res.reason)
 				#sys.stdout.write("\n\n\r\n", self.url, res.status, res.reason)
 				print(res.status, res.reason)
+				print(url)
 				self.reconnect()
 				return False
 			self.content = res.read().decode(encoding).encode('utf-8').decode('utf-8')
@@ -451,6 +452,27 @@ class ScraperNewsmn(Scraper):
 	def url_to_aid(self, url):
 		endUrl = url.split('content/')[1]
 		aid = endUrl[:endUrl.find('.shtml')]
+		if aid is not None:
+			return aid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
+			
+class ScraperAzatutyun(Scraper):
+	domain = "www.azatutyun.am"
+	prefix = "azatutyun"
+	
+	def scraped(self):
+		self.get_content()
+		contentFinal = ""
+		for zoomMeTag in self.doc.find_class("zoomMe"):
+				content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(zoomMeTag).decode('utf-8'))).text_content().strip()
+				if len(content) > len(contentFinal):
+					contentFinal = content
+		return contentFinal
+		
+	def url_to_aid(self, url):
+		endUrl = url.split('article/')[1]
+		aid = endUrl[:endUrl.find('.html')]
 		if aid is not None:
 			return aid
 		else:
