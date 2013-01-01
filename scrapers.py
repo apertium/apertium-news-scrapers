@@ -395,26 +395,6 @@ class ScraperOlloo(Scraper):
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
 
-
-class ScraperAzatutyun(Scraper):
-	domain = "www.azatutyun.am"
-	prefix = "azatutyun"
-
-	def scraped(self):
-		print("scrapers.py: scraped() is returning: ")
-		#print self.get_content()
-
-		return self.get_content()
-
-
-	def url_to_aid(self, url):
-		print("scrapers.py: url_to_aid("+url+")")
-
-		if self.rePagecode.search(url):
-			return self.rePagecode.search(url).groups()[0]
-		else:
-			return sha1(url.encode('utf-8')).hexdigest()
-
 class ScraperBolod(Scraper):
 	domain = "www.bolod.mn"
 	prefix = "bolod"
