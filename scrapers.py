@@ -440,15 +440,19 @@ class ScraperNewsmn(Scraper):
 class ScraperAzatutyun(Scraper):
 	domain = "www.azatutyun.am"
 	prefix = "azatutyun"
+	badClasses = ['mediaplayer audioplayer','cannot-play j_errorContainer']
 	
 	def scraped(self):
 		self.get_content()
 		contentFinal = ""
 		for zoomMeTag in self.doc.find_class("zoomMe"):
-				content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(zoomMeTag).decode('utf-8'))).text_content().strip()
+				content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(zoomMeTag).decode('utf-8')))
 				if len(content) > len(contentFinal):
 					contentFinal = content
-		return contentFinal
+		for className in self.badClasses:
+			for el in contentFinal.find_class(className):
+				el.getparent().remove(el)
+		return contentFinal.text_content().strip()
 		
 	def url_to_aid(self, url):
 		endUrl = url.split('article/')[1]
