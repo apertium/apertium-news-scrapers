@@ -9,7 +9,7 @@ from scrapers import ScraperAzattyk
 from scraper_classes import Source
 import urllib.error
 import http.client
-import curses
+#import curses
 import sys
 
 #urltemplate = "http://www.azattyk.org/archive/%s/%s%02d01/%s/%s.html"
@@ -25,10 +25,10 @@ topics = {392: "ky-kyrgyzstan",
 	399: "ky-voice_of_people",
 	400: "ky-sport"}
 
-startyear = 2009 # 2006
-endyear = 2009
-minmonth = 1 # 1
-maxmonth = 12 # 12
+startyear = 2012 # 2006
+endyear = 2012
+minmonth = 2 # 1
+maxmonth = 2 # 12
 
 def get_urls(monthurl):  # get the URLS for a given month
 	sys.stdout.write("\rGetting %s." % monthurl)
