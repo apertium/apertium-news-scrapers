@@ -12,12 +12,12 @@ h = html.parser.HTMLParser()
 
 class Scraper(object):
 	
-	def __init__(self, url, conn=None): #, content):
+	def __init__(self, url, date="", conn=None): #, content):
 		self.url = url
 		self.conn = conn
 		#self.content = content
 		self.aid = self.url_to_aid(url)
-		self.date = ""
+		self.date = date
 
 	def get_content(self, encoding='utf-8'):
 		self.reconnect()
@@ -32,9 +32,9 @@ class Scraper(object):
 				print(url)
 				self.reconnect()
 				return False
-			self.content = res.read().decode(encoding).encode('utf-8').decode('utf-8')
+			self.content = res.read().decode(encoding).encode('utf-8').decode('utf-8').replace('\r', ' ') #replace clears residual \r from '\r\n' in html
 		else:
-			self.content = request.urlopen(self.url).read().decode(encoding)
+			self.content = request.urlopen(self.url).read().decode(encoding).replace('\r', ' ')
 		towrite = lxml.html.fromstring(self.content)
 		if towrite is not None:
 			self.doc = towrite
@@ -77,7 +77,7 @@ class ScraperAzattyk(Scraper):
 	domain = "www.azattyk.org"
 	prefix = "rferl"
 	rePagecode = re.compile("\/([0-9]*)\.html?")
-
+	
 	def scraped(self):
 		if self.get_content():
 			#print(self.doc)
@@ -91,6 +91,8 @@ class ScraperAzattyk(Scraper):
 							el = ela
 			if el != "":
 				cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(el).decode('utf-8')))
+				for el in cleaned.find_class("embedded_content_object"):
+					el.getparent().remove("embedded_content_object")
 				#for className in self.badClasses:
 				#	for el in cleaned.find_class(className):
 				#		el.getparent().remove(el)
@@ -440,20 +442,20 @@ class ScraperNewsmn(Scraper):
 class ScraperAzatutyun(Scraper):
 	domain = "www.azatutyun.am"
 	prefix = "azatutyun"
-	badClasses = ['mediaplayer audioplayer','cannot-play j_errorContainer']
+	badClasses = ['mediaplayer audioplayer','cannot-play j_errorContainer', 'downloadlinkstatic', 'playlistlink']
 	
 	def scraped(self):
 		self.get_content()
 		contentFinal = ""
 		for zoomMeTag in self.doc.find_class("zoomMe"):
-				content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(zoomMeTag).decode('utf-8')))
-				if len(content) > len(contentFinal):
-					contentFinal = content
+			content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(zoomMeTag).decode('utf-8')))
+			if len(content.text_content()) > len(contentFinal.text_content() if contentFinal != "" else contentFinal):
+				contentFinal = content
 		for className in self.badClasses:
 			for el in contentFinal.find_class(className):
 				el.getparent().remove(el)
 		return contentFinal.text_content().strip()
-		
+
 	def url_to_aid(self, url):
 		endUrl = url.split('article/')[1]
 		aid = endUrl[:endUrl.find('.html')]

@@ -73,13 +73,15 @@ class Source(object):
 	page_contents = None
 	out_content = None
 
-	def __init__(self, url, scraper=None, title=None, conn=None):
+	def __init__(self, url, date = None, scraper=None, title=None, conn=None):
 		self.url = url
 		self.title = title
 		self.conn = conn
+		self.date = date
 		if not scraper:
 			self.scraper = self.get_scraper(url)
-		else: self.scraper = scraper
+		else: 
+			self.scraper = scraper
 		self.domain = self.scraper.domain
 		if not self.scraper:
 			raise Exception("No scraper set!")
@@ -167,7 +169,7 @@ class Source(object):
 		sys.stdout.flush()
 
 	def add_to_archive(self, msg=None):
-		scraper = self.scraper(self.url, conn=self.conn)
+		scraper = self.scraper(self.url, self.date, conn=self.conn)
 		self.aid = scraper.aid
 		self.entry_id = self.scraper.prefix +"."+ self.aid
 		if self.entry_id not in self.ids:
@@ -189,7 +191,7 @@ class Source(object):
 			if self.out_content:
 				outTime = datetime.now().isoformat()
 				#print(self.root, self.url, self.entry_id, self.title, outTime, self.out_content)
-				etree.SubElement(self.root, "entry", source=self.fullurl, id=self.entry_id, title=self.title, timestamp=outTime, date=self.date).text = self.out_content
+				etree.SubElement(self.root, "entry", source=self.fullurl, id=self.entry_id, title=self.title, timestamp=outTime, date = "" if self.date is None else self.date.isoformat()).text = self.out_content
 				#print(outdir, self.filename, self)
 				etree.ElementTree(self.root).write(self.path, pretty_print=True, encoding='UTF-8', xml_declaration=False)
 				#print("added.")

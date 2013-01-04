@@ -7,8 +7,8 @@ from scraper_classes import Source
 from scrapers import ScraperAzatutyun
 import copy
 
-startDate = date(2011, 11, 4)
-endDate = date(2011, 11, 5) #scraper is inclusive of both dates
+startDate = date(2012, 12, 1)
+endDate = date(2012, 12, 31) #scraper is inclusive of both dates
 
 urlTemplate = "/archive/Armenian_Archive/%s/729/729.html"
 
@@ -28,12 +28,12 @@ def getPage(conn, url, rawContent = False):
 
 def printArticles(articlesData, fileName, display=False):
 	if display:
-		for (title, url) in articlesData:
-			print(title, url)
+		for (title, url, date) in articlesData:
+			print(title, url, date.isoformat())
 	else:
 		with open(fileName, 'a', encoding='utf-8') as file:
-			for (title, url) in articlesData:
-				file.write("%s, %s\n" % (title, url))
+			for (title, url, date) in articlesData:
+				file.write("%s, %s, %s\n" % (title, url, date.isoformat()))
 
 def populateArticlesList(conn):
 	oneDay = timedelta(days = 1)
@@ -51,7 +51,7 @@ def populateArticlesList(conn):
 				title = (spanTag.text).strip()
 			else:
 				title = title = (aTag.text).strip()
-			articles.append((title, "http://www.azatutyun.am" + url))
+			articles.append((title, "http://www.azatutyun.am" + url, tempDate))
 		tempDate = tempDate + oneDay
 	
 def main(startDate, endDate):
@@ -63,9 +63,9 @@ def main(startDate, endDate):
 	ids = None
 	root = None
 	scrapedNum = 0
-	for (title, url) in articles:
+	for (title, url, date) in articles:
 		try:
-			source = Source(url, title=title, scraper=ScraperAzatutyun, conn=conn)
+			source = Source(url, title=title, date = date, scraper=ScraperAzatutyun, conn=conn)
 			source.makeRoot("./", ids=ids, root=root, lang="hye")
 			source.add_to_archive()
 			if ids is None:
@@ -82,4 +82,3 @@ fileName = 'test2.txt'
 with open(fileName, 'w'):
     pass
 main(startDate, endDate)
-printArticles(articles, fileName) #, display=True)
