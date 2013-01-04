@@ -442,7 +442,7 @@ class ScraperNewsmn(Scraper):
 class ScraperAzatutyun(Scraper):
 	domain = "www.azatutyun.am"
 	prefix = "azatutyun"
-	badClasses = ['mediaplayer audioplayer','cannot-play j_errorContainer', 'downloadlinkstatic', 'playlistlink']
+	badClasses = ['mediaplayer audioplayer','cannot-play j_errorContainer', 'downloadlinkstatic', 'playlistlink', 'expandMediaClose']
 	
 	def scraped(self):
 		self.get_content()
