@@ -8,11 +8,9 @@ from scraper_classes import Source
 from scrapers import ScraperChuvash
 import re
 
-numScrape = 50 #-1 will scrape all articles, 10 will scrape 10 newest articles
+numScrape = 5 #-1 will scrape all articles, 10 will scrape 10 newest articles
 
 urlTemplate = "/news/%s.html"
-
-articles = []
 
 def getPage(conn, url, rawContent = False):
 	conn.request("GET", url)
@@ -26,61 +24,33 @@ def getPage(conn, url, rawContent = False):
 	doc = lxml.html.fromstring(contents)
 	return doc
 
-def printArticles(articlesData, fileName, display=False):
-	if display:
-		for (title, url, date) in articlesData:
-			print(title, url, str(date))
-	else:
-		with open(fileName, 'a', encoding='utf-8') as file:
-			for (title, url, date) in articlesData:
-				file.write("%s, %s, %s\n" % (title, url, str(date)))
-
 def main(numScrape):
 	conn = http.client.HTTPConnection("www.chuvash.org")
 	mainPage = getPage(conn, '')
 	latestArticleNum = int(mainPage.xpath("//h2[@class='hipar_head']")[0][0].attrib['href'].split('news/')[1].replace('.html',''))
-	print('Getting %s URLs...' % ('all' if numScrape is -1 else numScrape))
-	numScraped = 0 #URLs Scraped
+	print('Scraping %s articles...' % ('all' if numScrape is -1 else numScrape))
+	numScraped = 0
+	attemptScrape = 0
 	i = latestArticleNum
-	while i >= 1 and (numScraped < numScrape or numScrape is -1):
-		url = urlTemplate % i
-		articleHtml = getPage(conn, url)
-		title = ""
-		articlePage = getPage(conn, urlTemplate % i)
-		if lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(articlePage.find_class("hipar_text")[0]).decode('utf-8'))).text_content().strip() is not "":
-			title = articlePage.xpath("//span[@style='color:#af2900;']")[0].text_content()
-			try:
-				date = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(articlePage.find_class("tags")[0]).decode('utf-8'))).text_content().strip()
-				date = re.findall('[0-9]{2}\.[0-9]{2}\.[0-9]{4}', date)[0]
-				date = time.strftime('%d-%m-%Y', time.strptime(date, "%d.%m.%Y"))
-			except:
-				date = None
-			articles.append((title, "http://www.chuvash.org" + url, date))
-			numScraped += 1
-		i -= 1
-	print('%s URLs retrieved.' % numScraped)
-	
-	
-	print('Scraping articles...')
-	scrapedNum = 0 #Articles scraped
 	ids = None
 	root = None
-	for (title, url, date) in articles:
+	while i >= 1 and (numScraped < numScrape or numScrape is -1):
 		try:
-			source = Source(url, title=title, date = date, scraper=ScraperChuvash, conn=conn)
-			source.makeRoot("./", ids=ids, root=root, lang="hye")
+			attemptScrape += 1
+			url = urlTemplate % i
+			source = Source(url, scraper=ScraperChuvash, conn=conn)
+			source.makeRoot("./", ids=ids, root=root, lang="cv")
 			source.add_to_archive()
 			if ids is None:
 				ids = source.ids
 			if root is None:
 				root = source.root
-			scrapedNum += 1
+			numScraped += 1
 		except Exception as e:
-			print(url + " " + str(e))			
-	print("%s articles scraped" % scrapedNum)
-			
-		
-		
+			print(url + " " + str(e))
+		i -= 1
+	print("Attempted to scrape %s articles." % attemptScrape)	
+	print("%s articles scraped." % numScraped)
 	conn.close()
 	
 main(numScrape)

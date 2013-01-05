@@ -12,12 +12,13 @@ h = html.parser.HTMLParser()
 
 class Scraper(object):
 	
-	def __init__(self, url, date="", conn=None): #, content):
+	def __init__(self, url, date="", conn=None, source = None): #, content):
 		self.url = url
 		self.conn = conn
 		#self.content = content
 		self.aid = self.url_to_aid(url)
 		self.date = date
+		self.source = source
 
 	def get_content(self, encoding='utf-8'):
 		self.reconnect()
@@ -45,7 +46,6 @@ class Scraper(object):
 	def reconnect(self):
 		self.conn.close()
 		self.conn.connect()
-
 
 class ScraperKloop(Scraper):
 	domain = "kmb3.kloop.kg"
@@ -106,7 +106,6 @@ class ScraperAzattyk(Scraper):
 			return self.rePagecode.search(url).groups()[0]
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
-
 
 class ScraperAzattyq(Scraper):
 	domain = "www.azattyq.org"
@@ -203,8 +202,6 @@ class ScraperAzattyq(Scraper):
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
 
-
-
 class ScraperTRT(Scraper):
 	domain = "www.trtkyrgyz.com"
 	prefix = "trt"
@@ -274,7 +271,6 @@ class ScraperAlaman(Scraper):
 	def url_to_aid(self, url):
 		return self.reArticleNum.search(url).groups()[0]
 
-
 class ScraperAzathabar(Scraper):
 	domain = "www.azathabar.com"
 	prefix = "rferl"
@@ -317,8 +313,6 @@ class ScraperAzathabar(Scraper):
 					#print("INTROTEXT")
 			else:
 				el = self.doc.get_element_by_id('introText')
-
-
 
 			#for el in self.doc.find_class('zoomMe'):
 			#	pass
@@ -373,7 +367,6 @@ class ScraperAzathabar(Scraper):
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
 
-
 class ScraperOlloo(Scraper):
 	domain = "www.olloo.mn"
 	prefix = "olloo"
@@ -414,7 +407,7 @@ class ScraperBolod(Scraper):
 			return uid
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
-			
+	
 class ScraperNewsmn(Scraper):
 	domain = "www.news.mn"
 	prefix = "newsmn"
@@ -470,7 +463,16 @@ class ScraperChuvash(Scraper):
 	
 	def scraped(self):
 		self.get_content()
+		for el in self.doc.xpath("//span[@style='font-family:Verdana;font-size:10px;']"):
+			el.getparent().remove(el)
 		content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class("hipar_text")[0]).decode('utf-8'))).text_content().strip()
+		self.source.title = self.doc.xpath("//span[@style='color:#af2900;']")[0].text_content()
+		try:
+			date = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class("tags")[0]).decode('utf-8'))).text_content().strip()
+			date = re.findall('[0-9]{2}\.[0-9]{2}\.[0-9]{4}', date)[0]
+			self.date = time.strftime('%Y-%m-%d', time.strptime(date, "%d.%m.%Y"))
+		except:
+			self.date = None
 		return content
 		
 	def url_to_aid(self, url):

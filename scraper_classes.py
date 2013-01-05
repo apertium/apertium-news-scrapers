@@ -91,7 +91,7 @@ class Source(object):
 		
 	def get_scraper(self, url):
 		return
-	
+		
 	def get_page(self, link):
 		print("DEBUG: "+str(self.conn))
 		if self.conn != None:
@@ -170,7 +170,7 @@ class Source(object):
 		sys.stdout.flush()
 
 	def add_to_archive(self, msg=None):
-		scraper = self.scraper(self.url, self.date, conn=self.conn)
+		scraper = self.scraper(self.url, self.date, conn=self.conn, source=self)
 		self.aid = scraper.aid
 		self.entry_id = self.scraper.prefix +"."+ self.aid
 		if self.entry_id not in self.ids:
