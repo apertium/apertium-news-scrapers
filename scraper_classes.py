@@ -28,7 +28,8 @@ class Feed(object):
 		"www.bbc.co.uk": ScraperBBC,
 		"alamankg.org": ScraperAlaman,
 		"www.news.mn": ScraperNewsmn,
-		"www.azatutyun.am": ScraperAzatutyun
+		"www.azatutyun.am": ScraperAzatutyun,
+		"www.chuvash.org": ScraperChuvash
 	}		
 
 	which_scraper = None;
@@ -191,7 +192,7 @@ class Source(object):
 			if self.out_content:
 				outTime = datetime.now().isoformat()
 				#print(self.root, self.url, self.entry_id, self.title, outTime, self.out_content)
-				etree.SubElement(self.root, "entry", source=self.fullurl, id=self.entry_id, title=self.title, timestamp=outTime, date = "" if self.date is None else self.date.isoformat()).text = self.out_content
+				etree.SubElement(self.root, "entry", source=self.fullurl, id=self.entry_id, title=self.title, timestamp=outTime, date = "" if self.date is None else str(self.date)).text = self.out_content
 				#print(outdir, self.filename, self)
 				etree.ElementTree(self.root).write(self.path, pretty_print=True, encoding='UTF-8', xml_declaration=False)
 				#print("added.")

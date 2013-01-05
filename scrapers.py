@@ -463,3 +463,19 @@ class ScraperAzatutyun(Scraper):
 			return aid
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
+
+class ScraperChuvash(Scraper):
+	domain = "www.chuvash.org"
+	prefix = "chuvash"
+	
+	def scraped(self):
+		self.get_content()
+		content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class("hipar_text")[0]).decode('utf-8'))).text_content().strip()
+		return content
+		
+	def url_to_aid(self, url):
+		aid = url.split('news/')[1].replace('.html','')
+		if aid is not None:
+			return aid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
