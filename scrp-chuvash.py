@@ -8,7 +8,7 @@ from scraper_classes import Source
 from scrapers import ScraperChuvash
 import re
 
-numScrape = 5 #-1 will scrape all articles, 10 will scrape 10 newest articles
+numScrape = 50 #-1 will scrape all articles, 10 will scrape 10 newest articles
 
 urlTemplate = "/news/%s.html"
 
@@ -36,8 +36,7 @@ def main(numScrape):
 	root = None
 	while i >= 1 and (numScraped < numScrape or numScrape is -1):
 		try:
-			attemptScrape += 1
-			url = urlTemplate % i
+			url = "http://www.chuvash.org" + (urlTemplate % i)
 			source = Source(url, scraper=ScraperChuvash, conn=conn)
 			source.makeRoot("./", ids=ids, root=root, lang="cv")
 			source.add_to_archive()
@@ -45,7 +44,10 @@ def main(numScrape):
 				ids = source.ids
 			if root is None:
 				root = source.root
+			attemptScrape += 1
 			numScraped += 1
+			if len(source.out_content) is 0:
+				numScraped -= 1
 		except Exception as e:
 			print(url + " " + str(e))
 		i -= 1

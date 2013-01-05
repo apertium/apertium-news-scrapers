@@ -466,7 +466,8 @@ class ScraperChuvash(Scraper):
 		for el in self.doc.xpath("//span[@style='font-family:Verdana;font-size:10px;']"):
 			el.getparent().remove(el)
 		content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class("hipar_text")[0]).decode('utf-8'))).text_content().strip()
-		self.source.title = self.doc.xpath("//span[@style='color:#af2900;']")[0].text_content()
+		if self.source is not None:
+			self.source.title = self.doc.xpath("//span[@style='color:#af2900;']")[0].text_content()
 		try:
 			date = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class("tags")[0]).decode('utf-8'))).text_content().strip()
 			date = re.findall('[0-9]{2}\.[0-9]{2}\.[0-9]{4}', date)[0]
