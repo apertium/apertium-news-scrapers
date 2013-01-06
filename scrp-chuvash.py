@@ -46,7 +46,7 @@ def main(numScrape):
 				root = source.root
 			attemptScrape += 1
 			numScraped += 1
-			if len(source.out_content) is 0:
+			if source.out_content is not None and len(source.out_content) is 0:
 				numScraped -= 1
 		except Exception as e:
 			print(url + " " + str(e))
