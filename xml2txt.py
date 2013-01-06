@@ -10,8 +10,9 @@ import rlcompleter
 import subprocess
 
 def totxt(fn):
-	xmlFile = re.compile(".*\.xml$")
-	if xmlFile.match(fn):
+	#xmlFile = re.compile(".*\.xml$")
+	#if xmlFile.match(fn):
+	if os.path.isfile(fn):
 		fileHandle = open (fn,"r" )
 		lineList = fileHandle.readline()
 		fileHandle.close()
@@ -66,13 +67,15 @@ if args['output_file'] is not None:
 
 
 
-if (args['corpus_dir'])[-4:] == ".xml": #checks if user entered an xml file
+#if (args['corpus_dir'])[-4:] == ".xml": #checks if user entered an xml file
+if os.path.isfile(args['corpus_dir']): #checks if user entered an xml file
 	totxt(args['corpus_dir'])
 	if args['output_file'] is not None:
 		filename=args['corpus_dir'][args['corpus_dir'].rfind('/')+1:]
 		print("Adding content from "+filename)
 		print("Done.")
-else: #if directory
+#else: #if directory
+elif os.path.isdir(args['corpus_dir']):
 	os.chdir(args['corpus_dir'])
 	files = os.listdir('.')
 	for fn in files:
