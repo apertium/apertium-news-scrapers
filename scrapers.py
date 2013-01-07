@@ -33,6 +33,7 @@ class Scraper(object):
 				print(url)
 				self.reconnect()
 				return False
+			
 			self.content = res.read().decode(encoding).encode('utf-8').decode('utf-8').replace('\r', ' ') #replace clears residual \r from '\r\n' in html
 		else:
 			self.content = request.urlopen(self.url).read().decode(encoding).replace('\r', ' ')
@@ -478,6 +479,22 @@ class ScraperChuvash(Scraper):
 		
 	def url_to_aid(self, url):
 		aid = url.split('news/')[1].replace('.html','')
+		if aid is not None:
+			return aid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
+			
+class ScraperHypar(Scraper):
+	domain = "www.hypar.ru"
+	prefix = "hypar"
+	
+	def scraped(self):
+		self.get_content(encoding = 'cp1251')
+		content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(self.doc.find_class("txt_p")[0]).decode('utf-8'))).text_content().strip()
+		return content
+	
+	def url_to_aid(self, url):
+		aid = url.split('32/')[1].replace(r'/index.php','')
 		if aid is not None:
 			return aid
 		else:
