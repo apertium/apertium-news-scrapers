@@ -7,11 +7,21 @@ from scraper_classes import Source
 from scrapers import ScraperHypar
 import re
 import time
+import copy
+import calendar
 
-epochDate = date(2007, 11, 13) # = 835277... okay it's not really an "epoch"
+yearDates = {2007 : (date(2007, 11, 13), 835277),
+			 2008 : (date(2008, 1, 10), 835370), 
+			 2009 : (date(2009, 1, 11), 835787),
+			 2010 : (date(2010, 1, 12), 836204),
+			 2011 : (date(2011, 1, 12), 836620),
+			 2012 : (date(2012, 1, 11), 837035)
+			 }
+daysInMonth = 32
+daysMonth = [0, 31, -1, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-startDate = date(2007, 11, 28)
-endDate = date(2007, 11, 30) #scraper is inclusive of both dates
+startDate = date(2012, 6, 20)
+endDate = date(2012, 6, 20) #scraper is inclusive of both dates
 
 urlTemplate = "/nws/cldr/32/%s/index.php"
 
@@ -39,26 +49,30 @@ def printArticles(articlesData, fileName, display=False):
 				file.write("%s, %s, %s\n" % (title, url, str(date)))
 				
 def dateToNum(date):
-	return 835277 + (date - epochDate).days
+	daysMonth[2] = 29 if calendar.isleap(date.year) else 28
+	num = yearDates[date.year][1] + (date - yearDates[date.year][0]).days
+	for i in range(1, date.month):
+		num += daysInMonth - daysMonth[i]
+	return num
 
 def populateArticlesList(conn):
-	startNum = dateToNum(startDate)
-	endNum = dateToNum(endDate)
-	i = startNum
-	while i <= endNum:
-		url = urlTemplate % i
+	oneDay = timedelta(days = 1)
+	tempDate = copy.deepcopy(startDate)
+	while tempDate <= endDate:
+		dayNum = dateToNum(tempDate)
+		url = urlTemplate % dayNum
 		articlesHtml = getPage(conn, url)
 		articleTags = articlesHtml.find_class("local_news")
 		dateTags = articlesHtml.find_class("local_news_smp")
-		for j in range(0, len(articleTags)):
-			aTag = articleTags[j]
-			dateTag = dateTags[j]
+		for i in range(0, len(articleTags)):
+			aTag = articleTags[i]
+			dateTag = dateTags[i]
 			url = re.sub(r'\?id=.*','',aTag.attrib["href"])
 			title = (aTag.text).strip()
 			date = re.findall('[0-9]{2}\.[0-9]{2}\.[0-9]{4}', (dateTag.text).strip())[0]
 			date = time.strftime('%Y-%m-%d', time.strptime(date, "%d.%m.%Y"))
 			articles.append((title, url, date))
-		i += 1
+		tempDate += oneDay
 	
 def main(startDate, endDate):
 	print("Getting URLs from %s to %s..." % (startDate, endDate)) #inclusive of both dates
