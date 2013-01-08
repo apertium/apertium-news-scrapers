@@ -10,6 +10,9 @@ import time
 import copy
 import calendar
 
+startDate = date(2012, 6, 20)
+endDate = date(2012, 6, 20) #scraper is inclusive of both dates
+
 yearDates = {2007 : (date(2007, 11, 13), 835277),
 			 2008 : (date(2008, 1, 10), 835370), 
 			 2009 : (date(2009, 1, 11), 835787),
@@ -19,9 +22,6 @@ yearDates = {2007 : (date(2007, 11, 13), 835277),
 			 }
 daysInMonth = 32
 daysMonth = [0, 31, -1, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-startDate = date(2012, 6, 20)
-endDate = date(2012, 6, 20) #scraper is inclusive of both dates
 
 urlTemplate = "/nws/cldr/32/%s/index.php"
 
