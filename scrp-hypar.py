@@ -10,8 +10,8 @@ import time
 import copy
 import calendar
 
-startDate = date(2012, 6, 20)
-endDate = date(2012, 6, 20) #scraper is inclusive of both dates
+startDate = date(2012, 1, 1)
+endDate = date(2012, 1, 31) #scraper is inclusive of both dates
 
 yearDates = {2007 : (date(2007, 11, 13), 835277),
 			 2008 : (date(2008, 1, 10), 835370), 
