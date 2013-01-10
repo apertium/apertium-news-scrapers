@@ -10,8 +10,8 @@ import time
 import copy
 import calendar
 
-startDate = date(2011, 12, 10)
-endDate = date(2011, 12, 21) #scraper is inclusive of both dates
+startDate = date(2012, 1, 1)
+endDate = date(2012, 12, 31) #scraper is inclusive of both dates
 
 urlTemplate = "/nws/cldr/32/%s/index.php"
 
