@@ -10,9 +10,6 @@ import time
 import copy
 import calendar
 
-startDate = date(2012, 1, 1)
-endDate = date(2012, 1, 31) #scraper is inclusive of both dates
-
 yearDates = {2007 : (date(2007, 11, 13), 835277),
 			 2008 : (date(2008, 1, 10), 835370), 
 			 2009 : (date(2009, 1, 11), 835787),
@@ -22,6 +19,9 @@ yearDates = {2007 : (date(2007, 11, 13), 835277),
 			 }
 daysInMonth = 32
 daysMonth = [0, 31, -1, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+startDate = date(2011, 12, 10)
+endDate = date(2011, 12, 21) #scraper is inclusive of both dates
 
 urlTemplate = "/nws/cldr/32/%s/index.php"
 
@@ -48,10 +48,10 @@ def printArticles(articlesData, fileName, display=False):
 			for (title, url, date) in articlesData:
 				file.write("%s, %s, %s\n" % (title, url, str(date)))
 				
-def dateToNum(date):
-	daysMonth[2] = 29 if calendar.isleap(date.year) else 28
-	num = yearDates[date.year][1] + (date - yearDates[date.year][0]).days
-	for i in range(1, date.month):
+def dateToNum(convertDate):
+	daysMonth[2] = 29 if calendar.isleap(convertDate.year) else 28
+	num = yearDates[convertDate.year][1] + (convertDate - yearDates[convertDate.year][0]).days
+	for i in range(1, convertDate.month):
 		num += daysInMonth - daysMonth[i]
 	return num
 
