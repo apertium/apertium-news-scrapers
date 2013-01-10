@@ -10,16 +10,6 @@ import time
 import copy
 import calendar
 
-yearDates = {2007 : (date(2007, 11, 13), 835277),
-			 2008 : (date(2008, 1, 10), 835370), 
-			 2009 : (date(2009, 1, 11), 835787),
-			 2010 : (date(2010, 1, 12), 836204),
-			 2011 : (date(2011, 1, 12), 836620),
-			 2012 : (date(2012, 1, 11), 837035)
-			 }
-daysInMonth = 32
-daysMonth = [0, 31, -1, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
 startDate = date(2011, 12, 10)
 endDate = date(2011, 12, 21) #scraper is inclusive of both dates
 
@@ -49,6 +39,15 @@ def printArticles(articlesData, fileName, display=False):
 				file.write("%s, %s, %s\n" % (title, url, str(date)))
 				
 def dateToNum(convertDate):
+	yearDates = {2007 : (date(2007, 11, 13), 835277),
+				 2008 : (date(2008, 1, 10), 835370), 
+				 2009 : (date(2009, 1, 11), 835787),
+				 2010 : (date(2010, 1, 12), 836204),
+				 2011 : (date(2011, 1, 12), 836620),
+				 2012 : (date(2012, 1, 11), 837035)
+				 }
+	daysMonth = [0, 31, -1, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+	daysInMonth = 32
 	daysMonth[2] = 29 if calendar.isleap(convertDate.year) else 28
 	num = yearDates[convertDate.year][1] + (convertDate - yearDates[convertDate.year][0]).days
 	for i in range(1, convertDate.month):
