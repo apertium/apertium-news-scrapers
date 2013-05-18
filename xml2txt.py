@@ -56,7 +56,7 @@ def reattach(sentences):
 parser = argparse.ArgumentParser(description='xml to txt script')
 parser.add_argument('corpus_dir', metavar='i', help='corpus directory (input)')
 parser.add_argument('-o','--output_file', help='name of output_file', required=False)
-parser.add_argument('-s', '--sentence', action='store_true')
+parser.add_argument('-s', '--sentence', action='store_true', help="Splits corpus into sentences (only for trained languages; see http://wiki.apertium.org/wiki/Sentence_segmenting for more info)")
 
 
 
