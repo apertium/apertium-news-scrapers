@@ -598,3 +598,102 @@ class ScraperOzodlik(Scraper):
 				return idsofar
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
+
+class ScraperSvoboda(Scraper):
+	domain = "www.radiosvoboda.org"
+	prefix = "ukr.rferl"
+	rePagecode = re.compile("\/([0-9]*)\.html?")
+	rePagecode2 = re.compile("\?id=([0-9]*)")
+
+	def scraped(self):
+		#FIXME: check
+		if self.get_content():
+			#print(self.doc)
+			el = ""
+
+			self.get_date()
+
+			if len(self.doc.find_class('article_txt_intro')) > 0:
+				introels = self.doc.find_class('article_txt_intro')
+			else:
+				introels = None
+			if len(self.doc.find_class('articleContent')) > 0:
+				for el in self.doc.find_class('articleContent'):
+					pass
+				#print(str(el))
+				if len(el.find_class('zoomMe')) > 0:
+					el = el.find_class('zoomMe')[0]
+				if lxml.html.clean.clean_html(lxml.html.tostring(el).decode('utf-8')) != "":
+				#if el. is None:
+					#if self.doc.get_element_by_id('introText'):
+					try:
+						el = self.doc.get_element_by_id('introText')
+					except KeyError:
+						pass
+					#print("INTROTEXT")
+			else:
+				el = self.doc.get_element_by_id('introText')
+
+			#for el in self.doc.find_class('zoomMe'):
+			#	pass
+			#if el == "":
+			#	for ela in self.doc.find_class('boxwidget_part'):
+			#		if "id" in ela.attrib:
+			#			if ela.attrib['id'] == "descText":
+			#				el = ela
+			if el != "":
+				cleaned = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(el).decode('utf-8')))
+				#for className in self.badClasses:
+				#	for el in cleaned.find_class(className):
+				#		el.getparent().remove(el)
+				#print(cleaned.text_content())
+				#return cleaned.text_content()
+				for style in cleaned.findall(".//style"):
+					style.drop_tree()
+				for br in cleaned.findall(".//br"):
+					if br.tail:
+						br.tail="\n"+br.tail
+					else:
+						br.tail="\n"
+				for p in cleaned.findall('.//p'):
+					if p.tail:
+						p.tail="\n"+p.tail
+					else:
+						p.tail="\n"
+				to_return = cleaned.text_content()+"\n"
+				toadd = ""
+				if introels is not None:
+					for introel in introels:
+						toadd += introel.text_content()+"\n"
+				to_return = toadd + to_return
+
+				to_return = re.sub('\r\n*', '\n', to_return)
+				to_return = re.sub('\n\n\n*', '\n', to_return)
+				#print(to_return)
+				to_return = to_return.strip('\n \t')
+				return to_return
+
+			else:
+				return ""
+
+	def get_date(self):
+		dateEl = self.doc.find_class('article_date')
+		if len(dateEl)==0:
+			dateEl = self.doc.find_class('date')
+		dateBlah = dateEl[0].text_content().strip('\r\n	 ')
+		if re.match("^[0-9]{2}\.[0-9]{2}\.[0-9]{4}$", dateBlah):
+			self.date = time.strftime('%Y-%m-%d', time.strptime(dateBlah, "%d.%m.%Y"))
+		else:
+			dateBlah = re.sub('.*([0-9]{2}\.[0-9]{2}\.[0-9]{4} [0-9]{2}:[0-9]{2}).*', '\\1', dateBlah)
+			self.date = time.strftime('%Y-%m-%dT%H:%M', time.strptime(dateBlah, "%d.%m.%Y %H:%M"))
+
+	def url_to_aid(self, url):
+		if self.rePagecode.search(url):
+			idsofar = self.rePagecode.search(url).groups()[0]
+			if len(idsofar) > 4:
+				return idsofar
+			else:
+				idsofar = self.rePagecode2.search(url).groups()[0]
+				return idsofar
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
