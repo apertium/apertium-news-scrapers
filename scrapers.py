@@ -501,7 +501,7 @@ class ScraperHypar(Scraper):
 			return sha1(url.encode('utf-8')).hexdigest()
 
 class ScraperOzodlik(Scraper):
-	domain = "www.ozodlik.com"
+	domain = "www.ozodlik.org"
 	prefix = "uzb.rferl"
 	rePagecode = re.compile("\/([0-9]*)\.html?")
 	rePagecode2 = re.compile("\?id=([0-9]*)")
@@ -549,6 +549,8 @@ class ScraperOzodlik(Scraper):
 				#		el.getparent().remove(el)
 				#print(cleaned.text_content())
 				#return cleaned.text_content()
+				for videodownload in cleaned.find_class("downloadvideoico"):
+					videodownload.drop_tree()
 				for style in cleaned.findall(".//style"):
 					style.drop_tree()
 				for br in cleaned.findall(".//br"):
@@ -648,6 +650,8 @@ class ScraperSvoboda(Scraper):
 				#		el.getparent().remove(el)
 				#print(cleaned.text_content())
 				#return cleaned.text_content()
+				for videodownload in cleaned.find_class("downloadvideoico"):
+					videodownload.drop_tree()
 				for style in cleaned.findall(".//style"):
 					style.drop_tree()
 				for br in cleaned.findall(".//br"):

@@ -65,7 +65,7 @@ def get_urls(monthurl, pagetype):  # get the URLS for a given month
 				url = None
 				for a in el.findall(".//a"):
 					if "style" not in a.attrib:
-						title = a.text
+						title = a.text_content().strip()
 						url = a.attrib["href"]
 				if title == None or url == None:
 					for a in el.findall(".//a"):
