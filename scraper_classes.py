@@ -29,7 +29,8 @@ class Feed(object):
 		"alamankg.org": ScraperAlaman,
 		"www.news.mn": ScraperNewsmn,
 		"www.azatutyun.am": ScraperAzatutyun,
-		"www.chuvash.org": ScraperChuvash
+		"www.chuvash.org": ScraperChuvash,
+		"www.azadliq.org": ScraperAzadliq
 	}		
 
 	which_scraper = None;

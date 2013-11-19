@@ -484,6 +484,35 @@ class ScraperChuvash(Scraper):
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
 			
+class ScraperAzadliq(Scraper):
+	domain = "www.azadliq.org"
+	prefix = "azadliq"
+	badClasses = ['mediaplayer audioplayer','cannot-play j_errorContainer', 'downloadlinkstatic', 'playlistlink', 'expandMediaClose']
+	
+	def scraped(self):
+		self.get_content()
+		contentFinal = ""
+		for zoomMeTag in self.doc.find_class("zoomMe"):
+			content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(zoomMeTag).decode('utf-8')))
+			if len(content.text_content()) > len(contentFinal.text_content() if contentFinal != "" else contentFinal):
+				contentFinal = content
+		for className in self.badClasses:
+			for el in contentFinal.find_class(className):
+				el.getparent().remove(el)
+		return contentFinal.text_content().strip()
+
+	def url_to_aid(self, url):
+		if 'archive/news' in url:
+			aid = url.split('?id=')[1]
+		else:
+			urlSplit = re.findall('[0-9]{6,8}\.html$', url)
+			if len(urlSplit):
+				aid = urlSplit[0].replace('.html','')
+		if aid is not None:
+			return aid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
+			
 class ScraperHypar(Scraper):
 	domain = "www.hypar.ru"
 	prefix = "hypar"
