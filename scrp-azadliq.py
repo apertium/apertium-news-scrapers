@@ -9,7 +9,7 @@ import copy
 
 startDate = date(2012, 12, 1) #dates to scrape in the sections with calendar
 endDate = date(2012, 12, 1) #scraper is inclusive of both dates
-numPages = 12 #number of pages to scrape in the categories, scrape from 1 (newest) to numPages (oldest)
+numPages = 1 #number of pages to scrape in the categories, scrape from 1 (newest) to numPages (oldest)
 
 urlTemplate = '/archive/%s/%s/%s/%s.html'
 urlStructures = [('news', '1', 'cal', False), #True = scraped for article URLs, False = not yet scraped for article URLs
@@ -105,7 +105,7 @@ def main(startDate, endDate):
 	conn = http.client.HTTPConnection("www.azadliq.org")
 	populateArticlesList(conn)
 	#printArticles(articles, 'test2.txt', False)
-	print("%s URLs scraped from %s to %s and from %s pages" % (str(len(articles)), startDate, endDate, numPages))
+	print("%s URLs scraped from %s to %s and from %s pages * %s categories" % (str(len(articles)), startDate, endDate, numPages, str(len(urlStructures)-1)))
 	print("Scraping article content...")
 	ids = None
 	root = None
