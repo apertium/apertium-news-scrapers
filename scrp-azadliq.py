@@ -9,15 +9,15 @@ import copy
 
 startDate = date(2012, 12, 1) #dates to scrape in the sections with calendar
 endDate = date(2012, 12, 1) #scraper is inclusive of both dates
-numPages = 1 #number of pages to scrape in the categories, scrape from 1 (newest) to numPages (oldest)
+numPages = 12 #number of pages to scrape in the categories, scrape from 1 (newest) to numPages (oldest)
 
 urlTemplate = '/archive/%s/%s/%s/%s.html'
-urlStructures = [('news', '1', 'cal', False), #True = scraped for article URLs, False = not yet scraped for article URLs
-				('az_politics', '3', 'cat', False),
-				('az_society', '2', 'cat', False),
-				('az_economy', '4', 'cat', False),
-				('az_world', '749', 'cat', False),
-				('sport', '3577', 'cat', False)]
+urlStructures = [('news', '1', 'cal'),
+				('az_politics', '3', 'cat'),
+				('az_society', '2', 'cat'),
+				('az_economy', '4', 'cat'),
+				('az_world', '749', 'cat'),
+				('sport', '3577', 'cat')]
 
 articles = []
 
@@ -43,6 +43,7 @@ def printArticles(articlesData, fileName, display=False):
 				file.write("%s, %s, %s\n" % (title, url, date.isoformat()))
 
 def populateArticlesList(conn):
+	scrapedCategories = []
 	for urlStructure in urlStructures:
 		if urlStructure[2] == 'cal':
 			oneDay = timedelta(days = 1)
@@ -64,7 +65,7 @@ def populateArticlesList(conn):
 				tempDate = tempDate + oneDay
 		elif urlStructure[2] == 'cat':
 			for pageNum in range(0, numPages):
-				if not urlStructure[3]: #only if scraping not complete
+				if not urlStructure[0] in scrapedCategories: #only if scraping not complete
 					url = urlTemplate % (urlStructure[0], pageNum, urlStructure[1], urlStructure[1])
 					rawArticlesHtml = getPage(conn, url, rawContent = True).split("pages -->")[1]
 					articlesHtml = lxml.html.fromstring(rawArticlesHtml)
@@ -72,7 +73,7 @@ def populateArticlesList(conn):
 						articleTags = articlesHtml.xpath("descendant-or-self::*[contains(concat(' ', normalize-space(@class), ' '), ' archive_rowmm ')]/descendant::*[contains(concat(' ', normalize-space(@class), ' '), ' black ')]")
 						if len(articleTags) is 0:
 							print('Stopped scraping category %s after %s pages' % (urlStructure[0], pageNum))
-							urlStructure = urlStructure[:-1] + (True,) #scraping complete
+							scrapedCategories.append(urlStructure[0]) #scraping complete
 						for hTag in articleTags:
 							aTag = hTag[0]
 							url = aTag.attrib["href"]
@@ -86,7 +87,7 @@ def populateArticlesList(conn):
 						articleTags = articlesHtml.find_class("zoomMe")
 						if len(articleTags) is 0:
 							print('Stopped scraping category %s after %s pages' % (urlStructure[0], pageNum))
-							urlStructure = urlStructure[:-1] + (True,) #scraping complete
+							scrapedCategories.append(urlStructure[0]) #scraping complete
 						for liTag in articleTags:
 							if not len(liTag):
 								continue #some extraneous elements are being captured
