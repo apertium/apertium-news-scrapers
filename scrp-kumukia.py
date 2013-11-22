@@ -33,12 +33,13 @@ for cat in cats:
     if link.text_content() == "Далее...":
       links.append(_url(link.values()[0]))
 
-print("Found {} articles...".format(len(links)))
-
 if debug:
   for link in links:
     page = requests.get(link)
     if page.status_code != 200:
       print("{} is not reachable...".format(link))
+
+links = list(set(links))
+print("Found {} articles...".format(len(links)))
 
 print("\n".join(links))
