@@ -7,9 +7,9 @@ from scraper_classes import Source
 from scrapers import ScraperAzadliq
 import copy
 
-startDate = date(2012, 12, 1) #dates to scrape in the sections with calendar
-endDate = date(2012, 12, 1) #scraper is inclusive of both dates
-numPages = 12 #number of pages to scrape in the categories, scrape from 1 (newest) to numPages (oldest)
+startDate = date(2012, 1, 1) #dates to scrape in the sections with calendar
+endDate = date(2012, 12, 31) #scraper is inclusive of both dates
+numPages = 60 #number of pages to scrape in the categories, scrape from 1 (newest) to numPages (oldest)
 
 urlTemplate = '/archive/%s/%s/%s/%s.html'
 urlStructures = [('news', '1', 'cal'),
