@@ -41,3 +41,6 @@ links = list(set(links))
 print("Found {} articles...".format(len(links)))
 
 print("\n".join(links))
+
+#for link in links:
+#	FIXME: the scraper gets called here
