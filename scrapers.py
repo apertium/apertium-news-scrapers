@@ -2,6 +2,7 @@ import re
 import lxml.html
 import lxml.html.clean
 from urllib import request
+import urllib.parse
 from hashlib import sha1
 #import time.sleep
 from time import sleep
@@ -730,3 +731,56 @@ class ScraperSvoboda(Scraper):
 				return idsofar
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
+
+class ScraperAKumukia(Scraper):
+	domain = "kumukia.ru"
+	prefix = "kumukia"
+	dateRe = re.compile("[0-9]{2}\.[0-9]{2}\.[0-9]{4}")
+
+	def scraped(self):
+		self.get_content(encoding="utf-8")
+		#self.doc.find_class("qa-content"):		
+		for el in self.doc.xpath("//p[@class='href']"):
+			el.getparent().remove(el)
+		#print(lxml.html.clean.clean_html(self.doc).text_content())
+		if len(self.doc.find_class("qa-content"))>0:
+			contentElement = self.doc.find_class("qa-content")[0]
+		elif len(self.doc.xpath("//div[@id='qa-content']"))>0:
+			contentElement = self.doc.xpath("//div[@id='qa-content']")[0]
+		else:
+			contentElement = self.doc.xpath("//div[@id='qa-content']")[0]
+
+		### get rid of trailing junk ###
+		found = False
+		for el in contentElement:
+			if el.attrib.get("class")=='qa-info' or found:
+				#print(el)
+				found = True
+				el.drop_tree()
+			if el.tag=="style":
+				el.drop_tree()
+		if self.source is not None:
+			self.source.title = self.doc.xpath("//p[@class='title']")[0].text_content()
+		try:
+			#datetext = self.doc.find_class("qa-info")[0].decode('utf-8')
+			datetext = self.doc.xpath("//div[@class='qa-info']")[0].text_content()
+			#print("findall", re.findall("[0-9]{2}\.[0-9]{2}\.[0-9]{4}", datetext))
+			#print("dateRe", self.dateRe.findall(datetext))
+			date = self.dateRe.findall(datetext)[0]
+			#print(date)
+			self.date = time.strftime('%Y-%m-%d', time.strptime(date, "%d.%m.%Y"))
+		except:
+			self.date = None
+
+		content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(contentElement).decode('utf-8'))).text_content().strip()
+		return content
+	
+	def url_to_aid(self, url):
+		link = urllib.parse.unquote(url)
+		aid = link.split('.ru/')[1].replace(r'.html','')
+		if aid is not None:
+			return aid
+		else:
+			return sha1(link.encode('utf-8')).hexdigest()
+
+
