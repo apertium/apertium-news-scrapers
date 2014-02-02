@@ -1,5 +1,7 @@
 import re
 import lxml.html
+#from lxml import etree
+from lxml.html import builder as E
 import lxml.html.clean
 from urllib import request
 import urllib.parse
@@ -31,7 +33,7 @@ class Scraper(object):
 				#print("\r", self.url, res.status, res.reason)
 				#sys.stdout.write("\n\n\r\n", self.url, res.status, res.reason)
 				print(res.status, res.reason)
-				print(url)
+				print(self.url)
 				self.reconnect()
 				return False
 			
@@ -782,5 +784,101 @@ class ScraperAKumukia(Scraper):
 			return aid
 		else:
 			return sha1(link.encode('utf-8')).hexdigest()
+
+
+class ScraperKumukiaAdab(Scraper):
+	domain = "kumukia.ru/adabiat"
+	prefix = "kumukia.adabiyat"
+	aidRe = re.compile("work=([0-9]{1,3})\&page=([0-9]{1,3})")
+	notRus = ['46', '45']
+	noLang = ['60', '62', '63', '34']
+	defRus = ['59', '32']
+
+	def scraped(self):
+		self.get_content(encoding="windows-1251")
+		#self.doc.find_class("qa-content"):		
+		(work, page) = self.work_and_page(self.url)
+
+		root = E.HTML(self.doc)
+
+		if work in self.notRus:
+			rus = root.xpath("//*[@class='rus']")
+			if rus:
+				rus[0].attrib['class']='kum'
+			qum = root.xpath("//*[@class='qum']")
+			if qum:
+				qum[0].attrib['class']='kum'
+		elif work in self.noLang:
+			root.attrib['class'] = 'kum'	
+		if work in self.defRus:
+			for kum in root.xpath("//*[@class='kum']"):
+				kum.attrib['class']='rus'
+
+		# get rid of menus
+		for el in self.doc.xpath("//div[@class='topmenu']"):
+			el.getparent().remove(el)
+		# get rid of Russian text
+		for el in self.doc.xpath("//*[@class='rus']"):
+			el.getparent().remove(el)
+
+		#for el in self.doc.xpath("//a"):
+		#	el.getparent().remove(el)
+		#print(lxml.html.clean.clean_html(self.doc).text_content())
+		#contentElement = self.doc.find_class("qa-content")[0]
+
+		#kumykText = self.doc.xpath("//*[@class='kum']")
+		#if kumykText:
+		#	contentElement = kumykText[0]
+		#else:
+		#	# some pages just have class='rus'
+		#	return False
+
+		contentElement = E.HTML()
+		# the good stuff all seems to be in <p/td class='kum'> nodes.
+		# sometimes there's <pre class='kum'> within other class='kum' nodes;
+		# so we need to be careful and just choose the good stuff
+		for kumykText in self.doc.xpath("//p[@class='kum']|//td[@class='kum']"):
+			contentElement.append(kumykText)
+		#if contentElement is None:
+		#	# some pages just have class='rus'
+		#	return False
+
+		#contentElement = self.doc
+
+		### get rid of trailing junk ###
+		found = False
+
+		if self.source is not None:
+			h3 = self.doc.xpath("//h3")
+			if h3:
+				self.source.title = h3[0].text_content()
+			moreTitle = self.doc.xpath("//*[@class='title']")
+			if moreTitle:
+				if self.source.title != "":
+					self.source.title += " - "
+				self.source.title += moreTitle[0].text_content()
+		self.date = None
+
+		content = lxml.html.document_fromstring(lxml.html.clean.clean_html(lxml.html.tostring(contentElement).decode('utf-8'))).text_content().strip()
+		return content
+	
+	def work_and_page(self, url):
+		matches = self.aidRe.search(url)
+		if matches:
+			(work, page) = (matches.group(1), matches.group(2))
+			return (work, page)
+		else:
+			return (None, None)
+
+	def url_to_aid(self, url):
+		(work, page) = self.work_and_page(url)
+		if work and page:
+			aid = "w%s+p%s" % (work, page)
+		else: aid = None
+
+		if aid is not None:
+			return aid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
 
 
