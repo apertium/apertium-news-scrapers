@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 #import unicodedata
 
 from scrapers import ScraperKumukiaAdab
-from scraper_classes import Source
+from scraper_classes import Source, Writer
 
 
 debug = False
@@ -141,6 +141,7 @@ if __name__ == "__main__":
 	ids = None
 	root = None
 	this = 0
+	w = Writer()
 	#for (url, title) in allurls:
 	for link in links:
 		#sys.stdout.write("\r"+url+" "+title+"\n")
@@ -163,6 +164,6 @@ if __name__ == "__main__":
 			sys.stdout.write(" — %s \n" % e)
 			sys.stdout.flush()
 			raise
-
+	w.close()
 	conn.close()
 

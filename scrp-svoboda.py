@@ -7,7 +7,7 @@ from urllib import request
 import lxml.html
 import lxml.html.clean
 from scrapers import ScraperSvoboda
-from scraper_classes import Source
+from scraper_classes import Source, Writer
 import urllib.error
 import http.client
 import curses
@@ -136,6 +136,7 @@ def main():
 	ids = None
 	root = None
 	this = 0
+	w = Writer()
 	for (url, title) in allurls:
 		#sys.stdout.write("\r"+url+" "+title+"\n")
 		#sys.stdout.flush()
@@ -154,7 +155,7 @@ def main():
 			sys.stdout.write(" — %s \n" % e)
 			sys.stdout.flush()
 			raise
-	
+	w.close()
 	conn.close()
 
 def tryOneArticle(url):

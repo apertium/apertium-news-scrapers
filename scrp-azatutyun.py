@@ -3,7 +3,7 @@
 from datetime import date,timedelta
 import lxml.html
 import http.client
-from scraper_classes import Source
+from scraper_classes import Source, Writer
 from scrapers import ScraperAzatutyun
 import copy
 
@@ -63,6 +63,7 @@ def main(startDate, endDate):
 	ids = None
 	root = None
 	scrapedNum = 0
+	w = Writer()
 	for (title, url, date) in articles:
 		try:
 			source = Source(url, title=title, date = date, scraper=ScraperAzatutyun, conn=conn)
@@ -76,6 +77,7 @@ def main(startDate, endDate):
 		except Exception as e:
 			print(url + " " + str(e))			
 	print("%s articles scraped" % scrapedNum)
+	w.close()
 	conn.close()
 
 fileName = 'test2.txt'

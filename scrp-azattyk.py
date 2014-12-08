@@ -6,7 +6,7 @@ from urllib import request
 import lxml.html
 import lxml.html.clean
 from scrapers import ScraperAzattyk
-from scraper_classes import Source
+from scraper_classes import Source, Writer
 import urllib.error
 import http.client
 #import curses
@@ -102,6 +102,7 @@ def main():
 
 	ids = None
 	root = None
+	w = Writer()
 	for (url, title) in allurls:
 		#sys.stdout.write("\r"+url+" "+title+"\n")
 		#sys.stdout.flush()
@@ -117,7 +118,7 @@ def main():
 
 		except Exception as e:
 			sys.stdout.write(str(e))
-	
+	w.close()	
 	conn.close()
 
 main()

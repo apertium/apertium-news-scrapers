@@ -6,7 +6,7 @@ import os.path
 import urllib
 import sys
 from scrapers import ScraperBolod
-from scraper_classes import Source
+from scraper_classes import Source, Writer
 
 domain = "www.bolod.mn"
 article_url = "/modules.php?name=News&nID="
@@ -90,6 +90,7 @@ def main():
     conn = http.client.HTTPConnection("www.bolod.mn")
     ids = None
     root = None
+    w = Writer()
     for (url, title) in get_urls():
         try:
             source = Source(url, title=title, scraper=ScraperBolod, conn=conn)
@@ -103,6 +104,7 @@ def main():
                 root = source.root
         except Exception as e:
             sys.stdout.write(str(e))
+    w.close()
     conn.close()
 
 main()

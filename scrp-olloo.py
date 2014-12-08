@@ -7,7 +7,7 @@ import os.path
 import urllib
 import sys
 from scrapers import ScraperOlloo
-from scraper_classes import Source
+from scraper_classes import Source, Writer
 
 domain = "www.olloo.mn"
 article_url = "/modules.php?name=News&file=print&sid="
@@ -92,6 +92,7 @@ def main():
     conn = http.client.HTTPConnection("www.olloo.mn")
     ids = None
     root = None
+    w = Writer()
     for (url, title) in get_urls():
         try:
             source = Source(url, title=title, scraper=ScraperOlloo, conn=conn)
@@ -105,6 +106,7 @@ def main():
                 root = source.root
         except Exception as e:
             sys.stdout.write(str(e))
+    w.close()
     conn.close()
 
 main()

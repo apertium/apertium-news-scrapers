@@ -4,7 +4,7 @@ from datetime import date
 import time
 import lxml.html
 import http.client
-from scraper_classes import Source
+from scraper_classes import Source, Writer
 from scrapers import ScraperChuvash
 import re
 
@@ -34,6 +34,7 @@ def main(numScrape):
 	i = latestArticleNum
 	ids = None
 	root = None
+	w = Writer()
 	while i >= 1 and (numScraped < numScrape or numScrape is -1):
 		try:
 			url = "http://www.chuvash.org" + (urlTemplate % i)
@@ -53,6 +54,7 @@ def main(numScrape):
 		i -= 1
 	print("Attempted to scrape %s articles." % attemptScrape)	
 	print("%s articles scraped." % numScraped)
+	w.close()
 	conn.close()
 	
 main(numScrape)
