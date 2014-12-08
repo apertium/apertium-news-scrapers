@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 
-import re, urllib, os #feedparser, 
+import re, urllib, os
 from bottle import template
 from hashlib import sha1
-#from html_parser import MyHTMLParser
-#from scraper_parsers import *
 from scrapers import *
 import rssfucker
 from lxml import etree
 import lxml.html
 from lxml.html import clean
 from datetime import datetime
+from threading import Thread
 import sys
 
 urlMatcher = re.compile('^(http(s?)\:\/\/|~/|/)?([a-zA-Z]{1}([\w\-]+\.)+([\w]{2,5}))(:[\d]{1,5})?/?(\w+\.[\w]{3,4})?((\?\w+=\w+)?(&\w+=\w+)*)?')
+
+treeToWrite = None	# etree for Writer's writeToDisk()
+pathToWrite = None	# path for Writer's writeToDisk()
 
 class Feed(object):
 
@@ -41,19 +43,10 @@ class Feed(object):
 
 	def __init__(self, url):
 		self.which_scraper = self.get_scraper(url)
-		#self.feed = feedparser.parse(url)
 		self.feed = rssfucker.parse_rss(url)
-		#print(self.feed)
 		
 	def get_sources(self):
-		#for item in self.feed["entries"]:
 		for title, link in self.feed.items():
-			#for link in item["links"]:
-			#	title = item["title"]
-			#	print('++' , title);
-			#	print('++' , item["link"]);
-			#	thisScraper = self.which_scraper
-			#	yield Source(item["link"], scraper=thisScraper, title=title)
 			print('++' , title);
 			print('++' , link);
 			thisScraper = self.which_scraper
@@ -63,14 +56,13 @@ class Feed(object):
 	def get_scraper(self, url):
 		domain = self.domain_name.match(url).group(1)
 		which_scraper = self.feed_sites.get(domain)
-		if which_scraper == None:
+		if not which_scraper:
 			raise Exception("Can't get scraper!")
 		else:
 			return which_scraper
-		#else: Feed(url, which_scraper)
-
 
 class Source(object):
+
 	aid = None
 	scraper = None
 	parser = None
@@ -83,6 +75,7 @@ class Source(object):
 		self.title = title
 		self.conn = conn
 		self.date = date
+
 		if not scraper:
 			self.scraper = self.get_scraper(url)
 		else: 
@@ -90,8 +83,6 @@ class Source(object):
 		self.domain = self.scraper.domain
 		if not self.scraper:
 			raise Exception("No scraper set!")
-
-		#self.makeRoot()
 		
 	def get_scraper(self, url):
 		return
@@ -120,20 +111,11 @@ class Source(object):
 
 		self.outdir = outdir
 		self.path = os.path.join(self.outdir, self.filename)
+
 		if not self.filename_exists():
-			#self.page_contents = self.get_page(self.url)
-			#self.out_content = self.get_content()
-			#parser = self.parser
-			#print(self.page_contents.split('\n')[914])
-			#try:
-			#	parser.feed(self.page_contents)
-			#except Exception:
-			#	pass
-			#self.out_content = parser.get_content()
 			print("Adding...", end=" ")
 			self.out_content = scraper.scraped()
 
-			#print(outdir, self.filename, self)
 			with open(os.path.join(self.path), 'w+') as f:
 				f.write(template('source', title=self.title, content=self.out_content, url = self.url))
 			print("added.")
@@ -148,7 +130,6 @@ class Source(object):
 			self.ids += [item.attrib['id']]
 		sys.stdout.write(".\n")
 		sys.stdout.flush()
-		#print(self.ids)
 
 	def makeRoot(self, outdir, ids=None, root=None, lang="ky"):
 		sys.stdout.write("\r.")
@@ -164,6 +145,7 @@ class Source(object):
 				self.root = etree.parse(self.path).getroot()
 			else:
 				self.root = etree.Element("corpus", xmlns="http://apertium.org/xml/corpus/0.9", language=lang, name=self.scraper.prefix)
+				treeToWrite = self.root
 		else:
 			self.root = root
 		if not ids:
@@ -178,12 +160,11 @@ class Source(object):
 		self.aid = scraper.aid
 		self.entry_id = self.scraper.prefix +"."+ self.aid
 		if self.entry_id not in self.ids:
-			#print("Adding...", end=" ")
+
 			sys.stdout.write("\r")
 			if msg is not None:
 				sys.stdout.write(msg+" ")
-			#else:
-			#	sys.stdout.write("\r")
+
 			sys.stdout.write("Adding %s ." % self.url)
 			sys.stdout.flush()
 			self.out_content = scraper.scraped()
@@ -193,27 +174,63 @@ class Source(object):
 				self.fullurl = self.url
 			else:
 				self.fullurl = "http://%s%s" % (self.domain, self.url)
+
 			if self.out_content:
 				outTime = datetime.now().isoformat()
-				#print(self.root, self.url, self.entry_id, self.title, outTime, self.out_content)
+
 				etree.SubElement(self.root, "entry", source=self.fullurl, id=self.entry_id, title=self.title, timestamp=outTime, date = "" if self.date is None else str(self.date)).text = self.out_content
-				#print(outdir, self.filename, self)
-				etree.ElementTree(self.root).write(self.path, pretty_print=True, encoding='UTF-8', xml_declaration=False)
-				#print("added.")
+				
+				global treeToWrite, pathToWrite
+				treeToWrite = etree.ElementTree(self.root)
+				pathToWrite = self.path
+
 				sys.stdout.write(". added!\n")
 				sys.stdout.flush()
 				self.ids += [self.aid]
 			else:
-				#print("empty content, not added.")
 				sys.stdout.write("empty content, not added.\n")
 				sys.stdout.flush()
 
 		else:
-			#print(self.entry_id, " exists!  Skipping. :(")
 			sys.stdout.write("\r"+self.entry_id+" exists!  Skipping.\n")
 			sys.stdout.flush()
 
+class Writer(Thread):
+	def __init__(self, writingInterval=60):
+		if writingInterval < 1:
+			print("The given writing interval is not possible. Defaulting to 60 seconds.")
+			self.writingInterval = 60
+		print("Writer started")
+		self.writingInterval = writingInterval
+		self.writing = True
+		self.closingThread = False
+		thread = Thread(target=self.run, args=())
+		thread.daemon = True
+		thread.start()
 
+	def run(self):
+		while self.closingThread == False:
+			for i in range(self.writingInterval):
+				if self.closingThread:
+					break
+				else:
+					time.sleep(1)
+			if self.closingThread == True:
+				break
+			else:
+				self.writeToDisk()
+		self.writing = False
+
+	def close(self):
+		self.closingThread = True
+		while self.writing: # waiting until writing has ended
+			time.sleep(1)
+		self.writeToDisk()
+		print("Writer closed")
+
+	def writeToDisk(self):
+		if pathToWrite is not None and treeToWrite is not None:
+			treeToWrite.write(pathToWrite, pretty_print=True, encoding='UTF-8', xml_declaration=False)
 
 class SimpleHtmlScraper(object):
 	def url_to_aid(self, url):
@@ -224,7 +241,6 @@ class SimpleHtmlScraper(object):
 		self.prefix = prefix
 		self.outdir = outdir
 		self.aid = self.url_to_aid(url)
-		#self.filename = self.prefix+".%s.html" % self.aid
 		self.filename = "%s.%s.html" % (self.prefix, self.aid)
 		self.title = ""
 		self.content = ""

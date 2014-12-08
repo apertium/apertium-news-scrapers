@@ -3,7 +3,7 @@
 from datetime import date
 import lxml.html
 import http.client
-from scraper_classes import Source
+from scraper_classes import Source, Writer
 from scrapers import ScraperNewsmn
 
 startDate = date(2011, 11, 1)
@@ -59,6 +59,7 @@ def main(startDate, endDate):
 	ids = None
 	root = None
 	scrapedNum = 0
+	w = Writer()
 	for (title, url) in articles:
 		if url.find("video.news") + url.find("id.news") + url.find("english.news") + url.find("photoalbum") is -4:
 			try:
@@ -73,6 +74,7 @@ def main(startDate, endDate):
 			except Exception as e:
 				print(url + " " + str(e))			
 	print("%s articles scraped" % scrapedNum)
+	w.close()
 	conn.close()
 
 fileName = 'test.txt'
