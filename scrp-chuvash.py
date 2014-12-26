@@ -35,23 +35,26 @@ def main(numScrape):
 	ids = None
 	root = None
 	w = Writer()
-	while i >= 1 and (numScraped < numScrape or numScrape is -1):
-		try:
-			url = "http://www.chuvash.org" + (urlTemplate % i)
-			source = Source(url, scraper=ScraperChuvash, conn=conn)
-			source.makeRoot("./", ids=ids, root=root, lang="cv")
-			source.add_to_archive()
-			if ids is None:
-				ids = source.ids
-			if root is None:
-				root = source.root
-			attemptScrape += 1
-			numScraped += 1
-			if source.out_content is not None and len(source.out_content) is 0:
-				numScraped -= 1
-		except Exception as e:
-			print(url + " " + str(e))
-		i -= 1
+	try:
+		while i >= 1 and (numScraped < numScrape or numScrape is -1):
+			try:
+				url = "http://www.chuvash.org" + (urlTemplate % i)
+				source = Source(url, scraper=ScraperChuvash, conn=conn)
+				source.makeRoot("./", ids=ids, root=root, lang="cv")
+				source.add_to_archive()
+				if ids is None:
+					ids = source.ids
+				if root is None:
+					root = source.root
+				attemptScrape += 1
+				numScraped += 1
+				if source.out_content is not None and len(source.out_content) is 0:
+					numScraped -= 1
+			except Exception as e:
+				print(url + " " + str(e))
+			i -= 1
+	except KeyboardInterrupt:
+		print("\nReceived a keyboard interrupt. Closing the program.")
 	print("Attempted to scrape %s articles." % attemptScrape)	
 	print("%s articles scraped." % numScraped)
 	w.close()

@@ -137,24 +137,27 @@ def main():
 	root = None
 	this = 0
 	w = Writer()
-	for (url, title) in allurls:
-		#sys.stdout.write("\r"+url+" "+title+"\n")
-		#sys.stdout.flush()
-		this += 1
-		try:
-			source = Source(url, title=title, scraper=siteScraper, conn=conn)
-			source.makeRoot("./", ids=ids, root=root, lang=siteLang)
-			msg = "(%s/%s)" % (this, len(allurls))
-			source.add_to_archive(msg=msg)
-			if ids is None:   # if not ids:
-				ids = source.ids
-			if root is None:  # if not root:
-				root = source.root
+	try:
+		for (url, title) in allurls:
+			#sys.stdout.write("\r"+url+" "+title+"\n")
+			#sys.stdout.flush()
+			this += 1
+			try:
+				source = Source(url, title=title, scraper=siteScraper, conn=conn)
+				source.makeRoot("./", ids=ids, root=root, lang=siteLang)
+				msg = "(%s/%s)" % (this, len(allurls))
+				source.add_to_archive(msg=msg)
+				if ids is None:   # if not ids:
+					ids = source.ids
+				if root is None:  # if not root:
+					root = source.root
 
-		except Exception as e:
-			sys.stdout.write(" — %s \n" % e)
-			sys.stdout.flush()
-			raise
+			except Exception as e:
+				sys.stdout.write(" — %s \n" % e)
+				sys.stdout.flush()
+				raise
+	except KeyboardInterrupt:
+		print("\nReceived a keyboard interrupt. Closing the program.")
 	w.close()
 	conn.close()
 
@@ -163,9 +166,11 @@ def tryOneArticle(url):
 	root = None
 	ids = None
 	conn = http.client.HTTPConnection(domain)
+	w = Writer()
 	source = Source(url, title="", scraper=siteScraper, conn=conn)
 	source.makeRoot("./", ids=ids, root=root, lang=siteLang)
 	source.add_to_archive()
+	w.close()
 	conn.close()
 
 main()

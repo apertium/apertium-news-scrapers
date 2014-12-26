@@ -64,19 +64,23 @@ def main(startDate, endDate):
 	root = None
 	scrapedNum = 0
 	w = Writer()
-	for (title, url, date) in articles:
-		try:
-			source = Source(url, title=title, date = date, scraper=ScraperAzatutyun, conn=conn)
-			source.makeRoot("./", ids=ids, root=root, lang="hye")
-			source.add_to_archive()
-			if ids is None:
-				ids = source.ids
-			if root is None:
-				root = source.root
-			scrapedNum += 1
-		except Exception as e:
-			print(url + " " + str(e))			
-	print("%s articles scraped" % scrapedNum)
+	try:
+		for (title, url, date) in articles:
+			try:
+				source = Source(url, title=title, date = date, scraper=ScraperAzatutyun, conn=conn)
+				source.makeRoot("./", ids=ids, root=root, lang="hye")
+				source.add_to_archive()
+				if ids is None:
+					ids = source.ids
+				if root is None:
+					root = source.root
+				scrapedNum += 1
+			except Exception as e:
+				print(url + " " + str(e))			
+		print("%s articles scraped" % scrapedNum)
+
+	except KeyboardInterrupt:
+		print("\nReceived a keyboard interrupt. Closing the program.")
 	w.close()
 	conn.close()
 

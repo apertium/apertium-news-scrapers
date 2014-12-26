@@ -103,21 +103,24 @@ def main():
 	ids = None
 	root = None
 	w = Writer()
-	for (url, title) in allurls:
-		#sys.stdout.write("\r"+url+" "+title+"\n")
-		#sys.stdout.flush()
+	try:
+		for (url, title) in allurls:
+			#sys.stdout.write("\r"+url+" "+title+"\n")
+			#sys.stdout.flush()
 
-		try:
-			source = Source(url, title=title, scraper=ScraperAzattyk, conn=conn)
-			source.makeRoot("./", ids=ids, root=root)
-			source.add_to_archive()
-			if ids is None:   # if not ids:
-				ids = source.ids
-			if root is None:  # if not root:
-				root = source.root
+			try:
+				source = Source(url, title=title, scraper=ScraperAzattyk, conn=conn)
+				source.makeRoot("./", ids=ids, root=root)
+				source.add_to_archive()
+				if ids is None:   # if not ids:
+					ids = source.ids
+				if root is None:  # if not root:
+					root = source.root
 
-		except Exception as e:
-			sys.stdout.write(str(e))
+			except Exception as e:
+				sys.stdout.write(str(e))
+	except KeyboardInterrupt:
+		print("\nReceived a keyboard interrupt. Closing the program.")
 	w.close()	
 	conn.close()
 

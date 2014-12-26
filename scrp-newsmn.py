@@ -60,20 +60,24 @@ def main(startDate, endDate):
 	root = None
 	scrapedNum = 0
 	w = Writer()
-	for (title, url) in articles:
-		if url.find("video.news") + url.find("id.news") + url.find("english.news") + url.find("photoalbum") is -4:
-			try:
-				source = Source(url, title=title, scraper=ScraperNewsmn, conn=conn)
-				source.makeRoot("./", ids=ids, root=root, lang="khk")
-				source.add_to_archive()
-				if ids is None:
-					ids = source.ids
-				if root is None:
-					root = source.root
-				scrapedNum += 1
-			except Exception as e:
-				print(url + " " + str(e))			
-	print("%s articles scraped" % scrapedNum)
+	try:
+		for (title, url) in articles:
+			if url.find("video.news") + url.find("id.news") + url.find("english.news") + url.find("photoalbum") is -4:
+				try:
+					source = Source(url, title=title, scraper=ScraperNewsmn, conn=conn)
+					source.makeRoot("./", ids=ids, root=root, lang="khk")
+					source.add_to_archive()
+					if ids is None:
+						ids = source.ids
+					if root is None:
+						root = source.root
+					scrapedNum += 1
+				except Exception as e:
+					print(url + " " + str(e))			
+		print("%s articles scraped" % scrapedNum)
+	
+	except KeyboardInterrupt:
+		print("\nReceived a keyboard interrupt. Closing the program.")
 	w.close()
 	conn.close()
 

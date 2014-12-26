@@ -71,27 +71,30 @@ if __name__ == "__main__":
 	root = None
 	this = 0
 	w = Writer()
-	#for (url, title) in allurls:
-	for link in links:
-		#sys.stdout.write("\r"+url+" "+title+"\n")
-		#sys.stdout.flush()
-		this += 1
-		try:
-			linkies = link.split('.')
-			url = linkies[0]+"."+urllib.parse.quote(linkies[1], encoding="utf8")
-			#print(url)
-			source = Source(url, scraper=siteScraper, conn=conn)
-			source.makeRoot("./", ids=ids, root=root, lang=siteLang)
-			msg = "(%s/%s)" % (this, len(links))
-			source.add_to_archive(msg=msg)
-			if ids is None:   # if not ids:
-				ids = source.ids
-			if root is None:  # if not root:
-				root = source.root
-		except Exception as e:
-			sys.stdout.write(" — %s \n" % e)
-			sys.stdout.flush()
-			raise
+	try:
+		#for (url, title) in allurls:
+		for link in links:
+			#sys.stdout.write("\r"+url+" "+title+"\n")
+			#sys.stdout.flush()
+			this += 1
+			try:
+				linkies = link.split('.')
+				url = linkies[0]+"."+urllib.parse.quote(linkies[1], encoding="utf8")
+				#print(url)
+				source = Source(url, scraper=siteScraper, conn=conn)
+				source.makeRoot("./", ids=ids, root=root, lang=siteLang)
+				msg = "(%s/%s)" % (this, len(links))
+				source.add_to_archive(msg=msg)
+				if ids is None:   # if not ids:
+					ids = source.ids
+				if root is None:  # if not root:
+					root = source.root
+			except Exception as e:
+				sys.stdout.write(" — %s \n" % e)
+				sys.stdout.flush()
+				raise
+	except KeyboardInterrupt:
+		print("\nReceived a keyboard interrupt. Closing the program.")
 	w.close()
 	conn.close()
 
