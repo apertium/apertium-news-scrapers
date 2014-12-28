@@ -7,6 +7,8 @@ import http.client
 from scraper_classes import Source, Writer
 from scrapers import ScraperChuvash
 import re
+import signal
+import sys
 
 numScrape = 50 #-1 will scrape all articles, 10 will scrape 10 newest articles
 
@@ -35,6 +37,13 @@ def main(numScrape):
 	ids = None
 	root = None
 	w = Writer()
+	
+	def term_handler(sigNum, frame):
+		w.close()
+		sys.exit(0)
+
+	signal.signal(signal.SIGTERM, term_handler)
+	
 	try:
 		while i >= 1 and (numScraped < numScrape or numScrape is -1):
 			try:

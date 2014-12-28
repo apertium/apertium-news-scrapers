@@ -5,6 +5,8 @@ import lxml.html
 import http.client
 from scraper_classes import Source, Writer
 from scrapers import ScraperNewsmn
+import signal
+import sys
 
 startDate = date(2011, 11, 1)
 endDate = date(2011, 11, 2) #scraper is inclusive of startDate but does not include endDate
@@ -60,6 +62,13 @@ def main(startDate, endDate):
 	root = None
 	scrapedNum = 0
 	w = Writer()
+
+	def term_handler(sigNum, frame):
+		w.close()
+		sys.exit(0)
+
+	signal.signal(signal.SIGTERM, term_handler)
+
 	try:
 		for (title, url) in articles:
 			if url.find("video.news") + url.find("id.news") + url.find("english.news") + url.find("photoalbum") is -4:

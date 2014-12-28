@@ -7,6 +7,7 @@ import urllib
 import sys
 from scrapers import ScraperBolod
 from scraper_classes import Source, Writer
+import signal
 
 domain = "www.bolod.mn"
 article_url = "/modules.php?name=News&nID="
@@ -91,6 +92,13 @@ def main():
     ids = None
     root = None
     w = Writer()
+    
+    def term_handler(sigNum, frame):
+        w.close()
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, term_handler)
+    
     try:
         for (url, title) in get_urls():
             try:

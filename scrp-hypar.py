@@ -9,6 +9,8 @@ import re
 import time
 import copy
 import calendar
+import signal
+import sys
 
 startDate = date(2012, 1, 1)
 endDate = date(2012, 12, 31) #scraper is inclusive of both dates
@@ -83,6 +85,13 @@ def main(startDate, endDate):
 	root = None
 	scrapedNum = 0
 	w = Writer()
+	
+	def term_handler(sigNum, frame):
+		w.close()
+		sys.exit(0)
+
+	signal.signal(signal.SIGTERM, term_handler)
+	
 	try:
 		for (title, url, date) in articles:
 			try:

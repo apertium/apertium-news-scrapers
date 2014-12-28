@@ -6,6 +6,7 @@ import hashlib
 import os.path
 import urllib
 import sys
+import signal
 from scrapers import ScraperOlloo
 from scraper_classes import Source, Writer
 
@@ -93,6 +94,13 @@ def main():
     ids = None
     root = None
     w = Writer()
+    
+    def term_handler(sigNum, frame):
+        w.close()
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, term_handler)
+    
     try:
         for (url, title) in get_urls():
             try:

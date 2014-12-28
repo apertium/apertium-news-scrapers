@@ -11,6 +11,7 @@ import urllib.error
 import http.client
 #import curses
 import sys
+import signal
 
 #urltemplate = "http://www.azattyk.org/archive/%s/%s%02d01/%s/%s.html"
 urltemplate = "/archive/%s/%s%02d01/%s/%s.html"
@@ -103,6 +104,13 @@ def main():
 	ids = None
 	root = None
 	w = Writer()
+
+	def term_handler(sigNum, frame):
+		w.close()
+		sys.exit(0)
+
+	signal.signal(signal.SIGTERM, term_handler)
+	
 	try:
 		for (url, title) in allurls:
 			#sys.stdout.write("\r"+url+" "+title+"\n")

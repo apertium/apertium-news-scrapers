@@ -6,6 +6,7 @@ from urllib import request
 import urllib.error
 import http.client
 import sys
+import signal
 
 from bs4 import BeautifulSoup
 #import unicodedata
@@ -142,6 +143,13 @@ if __name__ == "__main__":
 	root = None
 	this = 0
 	w = Writer()
+	
+	def term_handler(sigNum, frame):
+		w.close()
+		sys.exit(0)
+
+	signal.signal(signal.SIGTERM, term_handler)
+	
 	try:
 		#for (url, title) in allurls:
 		for link in links:
