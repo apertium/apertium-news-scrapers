@@ -116,6 +116,7 @@ def main(startDate, endDate):
 	w = Writer()
 
 	def term_handler(sigNum, frame):
+		print("\nReceived a SIGTERM signal. Closing the program.")
 		w.close()
 		sys.exit(0)
 
