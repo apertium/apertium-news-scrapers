@@ -1,5 +1,6 @@
 import re
 import lxml.html
+from lxml import html
 #from lxml import etree
 from lxml.html import builder as E
 import lxml.html.clean
@@ -10,6 +11,7 @@ from hashlib import sha1
 from time import sleep
 import time
 import html.parser
+import string
 
 h = html.parser.HTMLParser()
 
@@ -26,9 +28,13 @@ class Scraper(object):
 	def get_content(self, encoding='utf-8'):
 		self.reconnect()
 		if self.conn != None:
+			print("fooo")
+			print(self.url)
 			self.conn.request("GET", self.url)
+			
 			sleep(0.5)
 			res = self.conn.getresponse()
+		
 			if res.status != 200:
 				#print("\r", self.url, res.status, res.reason)
 				#sys.stdout.write("\n\n\r\n", self.url, res.status, res.reason)
@@ -938,4 +944,22 @@ class ScraperKrymr(Scraper):
 			return aid
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
+
+class ScraperAltay(Scraper):
+	domain = "altaicholmon.ru"
+	prefix = "altaicholmon"
+	
+	def scraped(self):
+		self.get_content(encoding="utf-8")
+		
+		translator = str.maketrans(dict.fromkeys("\n\t"))
+		items = self.doc.xpath('//div[@class="padding_news text-color"]/p/text()')
+		cleaned = ""
+		
+		for item in items:
+			cleaned = cleaned + str(item).translate(translator)
+		return cleaned
+
+	def url_to_aid(self, url):
+		return sha1(url.encode('utf-8')).hexdigest()
 	
