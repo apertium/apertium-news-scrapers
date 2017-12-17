@@ -1,4 +1,4 @@
-## This program scrapes news articles from the website http://altaicholmon.ru/.
+#!/usr/bin/env python3
 
 from lxml import html
 from datetime import date, timedelta
@@ -10,7 +10,7 @@ import requests
 import time
 import sys
 
-homepage = "http://altaicholmon.ru/news/allnews/"
+homepage = "http://altaicholmon.ru/news/alt/"
 
 translator = str.maketrans(dict.fromkeys("\n\t"))
 
