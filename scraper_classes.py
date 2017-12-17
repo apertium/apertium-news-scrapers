@@ -36,7 +36,7 @@ class Feed(object):
 		"kumukia.ru": ScraperAKumukia,
 		"kumukia.ru/adabiat": ScraperKumukiaAdab,
 		"www.radioerkinli.com": ScraperErkinli,
-        "altaicholmon.ru": ScraperAltay
+        "altaicholmon.ru": ScraperAltaicholmon
 	}		
 
 	which_scraper = None;

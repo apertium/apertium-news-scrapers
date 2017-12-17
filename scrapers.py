@@ -945,7 +945,7 @@ class ScraperKrymr(Scraper):
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
 
-class ScraperAltay(Scraper):
+class ScraperAltaicholmon(Scraper):
 	domain = "altaicholmon.ru"
 	prefix = "altaicholmon"
 	
@@ -961,5 +961,9 @@ class ScraperAltay(Scraper):
 		return cleaned
 
 	def url_to_aid(self, url):
-		return sha1(url.encode('utf-8')).hexdigest()
+		uid = url.split("cholmon.ru/")[1]
+		if uid is not None:
+			return uid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
 	
