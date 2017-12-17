@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import re, urllib, os
-from bottle import template
 from hashlib import sha1
 from scrapers import *
 import rssfucker
