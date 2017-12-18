@@ -28,13 +28,9 @@ class Scraper(object):
 	def get_content(self, encoding='utf-8'):
 		self.reconnect()
 		if self.conn != None:
-			print("fooo")
-			print(self.url)
 			self.conn.request("GET", self.url)
-			
 			sleep(0.5)
 			res = self.conn.getresponse()
-		
 			if res.status != 200:
 				#print("\r", self.url, res.status, res.reason)
 				#sys.stdout.write("\n\n\r\n", self.url, res.status, res.reason)
