@@ -954,7 +954,6 @@ class ScraperAltaicholmon(Scraper):
 		
 		for item in items:
 			cleaned = cleaned + str(item).translate(translator) + "\n"
-		print(cleaned)
 		return cleaned
 
 	def url_to_aid(self, url):
