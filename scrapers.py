@@ -962,4 +962,24 @@ class ScraperAltaicholmon(Scraper):
 			return uid
 		else:
 			return sha1(url.encode('utf-8')).hexdigest()
-	
+        
+class ScraperKhakaschiry(Scraper):
+    domain = "khakaschiry.ru"
+    prefix = "khakaschiry"
+    
+    def scraped(self):
+        self.get_content(encoding="utf-8")
+        translator = str.maketrans(dict.fromkeys("\n\t"))
+        items = self.doc.xpath('//div[@style="text-align: justify;"]//text()')
+        cleaned = ""
+        
+        for item in items:
+            cleaned = cleaned + str(item).translate(translator) + "\n"
+        return cleaned
+    
+    def url_to_aid(self, url):
+        uid = url.split("?ID=")[1]
+        if uid is not None:
+            return uid
+        else:
+            return sha1(url.encode('utf-8')).hexdigest()
