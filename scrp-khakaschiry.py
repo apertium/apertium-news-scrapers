@@ -9,7 +9,7 @@ import requests
 import time
 import sys
 
-homepage = "http://khakaschiry.ru/politika/"
+homepage = "http://khakaschiry.ru/news/"
 
 translator = str.maketrans(dict.fromkeys("\n\t"))
 
@@ -18,22 +18,22 @@ articles = []
 def populateArticleList(pageNum): #adds article information to the article list
     page = requests.get(homepage + "?PAGEN_1=" + str(pageNum))
     tree = html.fromstring(page.content)
-    hrefs = tree.xpath('//div[@class="category-news-item"]/a[@class="main-title"]/@href')
-    titles = tree.xpath('//a[@class="main-title"]/text()')
+    hrefs = tree.xpath('//div[@class="category-news-item"]/a[@class="green"]/@href')
+    titles = tree.xpath('//div[@class="category-news-item"]/a[@class="green"]/text()')
     dates = tree.xpath('//div/span[@class="news-date-time"]/text()')
     
     for i in range(0, len(hrefs)):
         hrefs[i] = "http://khakaschiry.ru" + hrefs[i]
         titles[i] = str(titles[i]).translate(translator).strip()
         dates[i] = str(dates[i]).translate(translator).strip()
-        articles.append((hrefs[i], titles[i], dates[i]))
+        articles.append((hrefs[i], titles[i], dates[i]))    
 		
 def getLastPage(): #calculates the number of pages on the news website
         tree = html.fromstring(requests.get(homepage).content)
-        lastPage = str(tree.xpath('//font[@class="text"]/a[contains(text(), "Тоозылғаны")]/@href')[0])
+        lastPage = str(tree.xpath('//font[@class="text"]/a[contains(text(), "Конец")]/@href')[0])
         
-        index = lastPage.index("?PAGEN_1=")
-        lastPageNum = lastPage[index + 9:]
+        index = lastPage.index("PAGEN_1=")
+        lastPageNum = lastPage[index + 8:]
 		
         return int(lastPageNum)
 	
@@ -48,13 +48,13 @@ def main():
     root = None
     w = Writer()
     
-    for i in range(0, 2): populateArticleList(i + 1)
+    for i in range(0, getLastPage()): populateArticleList(i + 1)
     
     try:
         for (url, title, date) in articles:
             try:
-                source = Source(url, title=title, date=date, scraper=ScraperKhakaschiry, conn=conn)
-                source.makeRoot("./", ids=ids, root=root, lang="kjh")
+                source = Source(url, title = title, date = date, scraper = ScraperKhakaschiry, conn = conn)
+                source.makeRoot("./", ids = ids, root = root, lang = "kjh")
                 source.add_to_archive()
                 if ids is None:
                     ids = source.ids

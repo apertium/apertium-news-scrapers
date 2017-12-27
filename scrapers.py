@@ -973,9 +973,20 @@ class ScraperKhakaschiry(Scraper):
         items = self.doc.xpath('//div[@style="text-align: justify;"]//text()')
         cleaned = ""
         
+        isKhakas = False
+        
         for item in items:
-            cleaned = cleaned + str(item).translate(translator) + "\n"
-        return cleaned
+            if str(item).find("ғ") != -1:
+                isKhakas = True
+                break
+        if isKhakas:
+            for item in items:
+                item = str(item).translate(translator)
+                cleaned = cleaned + item
+                return cleaned
+        else:
+            print("This page is not in Khakas . . . skipping.")
+            return None
     
     def url_to_aid(self, url):
         uid = url.split("?ID=")[1]
@@ -983,3 +994,4 @@ class ScraperKhakaschiry(Scraper):
             return uid
         else:
             return sha1(url.encode('utf-8')).hexdigest()
+        
