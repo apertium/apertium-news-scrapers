@@ -970,7 +970,9 @@ class ScraperKhakaschiry(Scraper):
 	def scraped(self):
 		self.get_content(encoding="utf-8")
 		translator = str.maketrans(dict.fromkeys("\n\t"))
-		items = self.doc.xpath('//div[@style="text-align: justify;"]//text()')
+		items = self.doc.xpath('//div[@style="text-align: justify;"]/b/text()')
+		for item in self.doc.xpath('//div/text()'): items.append(item)
+		for item in self.doc.xpath('//p/text()'): items.append(item)
 		cleaned = ""
         
 		isKhakas = False
@@ -985,7 +987,7 @@ class ScraperKhakaschiry(Scraper):
 			for item in items:
 				item = str(item).translate(translator)
 				cleaned = cleaned + item
-				return cleaned
+			return cleaned
 		else:
 			print("This page is not in Khakas . . . skipping.")
 			return None
