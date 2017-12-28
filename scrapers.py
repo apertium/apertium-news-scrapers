@@ -964,34 +964,36 @@ class ScraperAltaicholmon(Scraper):
 			return sha1(url.encode('utf-8')).hexdigest()
         
 class ScraperKhakaschiry(Scraper):
-    domain = "khakaschiry.ru"
-    prefix = "khakaschiry"
+	domain = "khakaschiry.ru"
+	prefix = "khakaschiry"
     
-    def scraped(self):
-        self.get_content(encoding="utf-8")
-        translator = str.maketrans(dict.fromkeys("\n\t"))
-        items = self.doc.xpath('//div[@style="text-align: justify;"]//text()')
-        cleaned = ""
+	def scraped(self):
+		self.get_content(encoding="utf-8")
+		translator = str.maketrans(dict.fromkeys("\n\t"))
+		items = self.doc.xpath('//div[@style="text-align: justify;"]//text()')
+		cleaned = ""
         
-        isKhakas = False
+		isKhakas = False
+		khakasCharacters = ["і", "ң", "ҷ", "ӧ", "ӱ", "ғ", "қ"]
         
-        for item in items:
-            if str(item).find("ғ") != -1:
-                isKhakas = True
-                break
-        if isKhakas:
-            for item in items:
-                item = str(item).translate(translator)
-                cleaned = cleaned + item
-                return cleaned
-        else:
-            print("This page is not in Khakas . . . skipping.")
-            return None
+		for item in items:
+			for character in khakasCharacters:
+				if str(item).find(character) != -1:
+					isKhakas = True
+					break
+		if isKhakas:
+			for item in items:
+				item = str(item).translate(translator)
+				cleaned = cleaned + item
+				return cleaned
+		else:
+			print("This page is not in Khakas . . . skipping.")
+			return None
     
-    def url_to_aid(self, url):
-        uid = url.split("?ID=")[1]
-        if uid is not None:
-            return uid
-        else:
-            return sha1(url.encode('utf-8')).hexdigest()
+	def url_to_aid(self, url):
+		uid = url.split("?ID=")[1]
+		if uid is not None:
+			return uid
+		else:
+			return sha1(url.encode('utf-8')).hexdigest()
         
