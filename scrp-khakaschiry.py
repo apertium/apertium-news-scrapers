@@ -48,7 +48,7 @@ def main():
     root = None
     w = Writer()
     
-    for i in range(0, 2): populateArticleList(i + 1)
+    for i in range(0, getLastPage()): populateArticleList(i + 1)
     
     try:
         for (url, title, date) in articles:
