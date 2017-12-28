@@ -9,8 +9,8 @@ import copy
 import sys
 import signal
 
-startDate = date(2012, 1, 1) #dates to scrape in the sections with calendar
-endDate = date(2012, 12, 31) #scraper is inclusive of both dates
+startDate = date(2013, 1, 1) #dates to scrape in the sections with calendar
+endDate = date(2013, 12, 31) #scraper is inclusive of both dates
 numPages = 60 #number of pages to scrape in the categories, scrape from 1 (newest) to numPages (oldest)
 
 urlTemplate = '/archive/%s/%s/%s/%s.html'
@@ -113,7 +113,7 @@ def main(startDate, endDate):
 	ids = None
 	root = None
 	scrapedNum = 0
-	w = Writer()
+	w = Writer(10)
 
 	def term_handler(sigNum, frame):
 		print("\nReceived a SIGTERM signal. Closing the program.")

@@ -48,8 +48,8 @@ topics = { 2239: ("news", "day"),
 	3264: ("Voice_of_people", "days"),
 }	
 
-startyear = 2010
-endyear = 2010
+startyear = 2012
+endyear = 2012
 minmonth = 1
 maxmonth = 12
 
@@ -151,7 +151,7 @@ def main():
 	ids = None
 	root = None
 	this = 0
-	w = Writer()
+	w = Writer(10)
 
 	def term_handler(sigNum, frame):
 		print("\nReceived a SIGTERM signal. Closing the program.")

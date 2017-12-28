@@ -91,7 +91,7 @@ def main():
     conn = http.client.HTTPConnection("www.bolod.mn")
     ids = None
     root = None
-    w = Writer()
+    w = Writer(5)
     
     def term_handler(sigNum, frame):
         print("\nReceived a SIGTERM signal. Closing the program.")

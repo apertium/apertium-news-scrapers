@@ -61,7 +61,7 @@ def main(startDate, endDate):
 	ids = None
 	root = None
 	scrapedNum = 0
-	w = Writer()
+	w = Writer(10)
 
 	def term_handler(sigNum, frame):
 		print("\nReceived a SIGTERM signal. Closing the program.")
