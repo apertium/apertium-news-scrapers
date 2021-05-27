@@ -19,7 +19,7 @@ def totxt(fn):
 		root = etree.parse(fn).getroot()
 		attributes = root.attrib
 		lang=attributes.get("language")
-		for item in root.getiterator("{http://apertium.org/xml/corpus/0.9}entry"):
+		for item in root.getiterator("{https://apertium.org/xml/corpus/0.9}entry"):
 			if args['sentence'] is not False: #split by sentence
 				itemtxt=str(item.text)
 				tosplit=itemtxt.replace('   ',' ')
@@ -56,7 +56,7 @@ def reattach(sentences):
 parser = argparse.ArgumentParser(description='xml to txt script')
 parser.add_argument('corpus_dir', metavar='i', help='corpus directory (input)')
 parser.add_argument('-o','--output_file', help='name of output_file', required=False)
-parser.add_argument('-s', '--sentence', action='store_true', help="Splits corpus into sentences (only for trained languages; see http://wiki.apertium.org/wiki/Sentence_segmenting for more info)")
+parser.add_argument('-s', '--sentence', action='store_true', help="Splits corpus into sentences (only for trained languages; see https://wiki.apertium.org/wiki/Sentence_segmenting for more info)")
 
 
 
